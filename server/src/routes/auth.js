@@ -53,5 +53,14 @@ authRouter.post('/login', async (req, res) => {
     }
 })
 
+authRouter.post('/logout', async (req, res) => {
+    res
+    .cookie('token', null, {
+        expires: new Date(Date.now()),  // expiring the token at current time 
+    }) 
+    // express method chaining
+    .send('Logged out successfully');
+})
+
 export default authRouter;
 
