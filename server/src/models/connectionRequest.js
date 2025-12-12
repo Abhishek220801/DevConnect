@@ -1,28 +1,38 @@
-import {mongoose, Schema, model} from 'mongoose'
+import {Schema, model} from 'mongoose'
 
 const connectionRequestSchema = new Schema({
     fromUserId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
+        ref: "User",
         required: true,
     },
     toUserId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
+        ref: "User",
         required: true,
     },
     status: {
         type: String,
         enum: {
-            values: ["pass", "like", "accept", "reject"],
+            values: ["like", "pass", "accept", "reject"],
             message: `{VALUE} is incorrect status type`
         },
         required: true,
+    },
+    matchedAt: {
+        type: Date, 
+        default: null,
     }
 }, {timestamps: true})
 
+connectionRequestSchema.index(
+    {fromUserId: 1, toUserId: 1},
+    {unique: true}
+);
+
+// Block sending CR to yourself
 connectionRequestSchema.pre('save', function (next) {
-    const connectionRequest = this;
-    // check if the fromUserId is same as toUserId
-    if(connectionRequest.fromUserId.equals(connectionRequest.toUserId)){
+    if(this.fromUserId.equals(this.toUserId)){
         throw new Error('Cannot send connection request to yourself!');
     }
     next();

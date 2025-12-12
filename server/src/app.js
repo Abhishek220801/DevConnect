@@ -11,6 +11,7 @@ import cookieParser from "cookie-parser"
 import authRouter from './routes/auth.js'
 import profileRouter from './routes/profile.js'
 import requestRouter from './routes/request.js'
+import userRouter from './routes/user.js'
 
 const app = express()
 const port = 7777
@@ -23,6 +24,7 @@ app.use("/user", userAuth)
 app.use('/', authRouter);
 app.use('/profile', profileRouter);
 app.use('/request', requestRouter);
+app.use('/user', userRouter);
 
 app.listen(port, () => {
   connectDB()

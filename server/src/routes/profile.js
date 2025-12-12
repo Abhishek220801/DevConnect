@@ -22,7 +22,7 @@ profileRouter.patch('/edit', userAuth, async (req, res) => {
         const updates = req.body || {};
         // Reject empty update
         if (Object.keys(updates).length === 0) {
-        return res.status(400).json({ message: 'No fields provided to update.' });
+            return res.status(400).json({ message: 'No fields provided to update.' });
         }
         Object.keys(req.body).forEach((key) => (loggedInUser[key]!=req.body[key]) ? loggedInUser[key] = req.body[key]: null);
         await loggedInUser.save();
@@ -38,12 +38,13 @@ profileRouter.patch('/edit', userAuth, async (req, res) => {
 profileRouter.patch('/password', userAuth, async (req, res) => {
     try {
         const loggedInUser = req.user;
+        // console.log(req);
         const {currentPassword, newPassword} = req.body;
+        // console.log('Current password: ', currentPassword + '\nHashed pass: ', loggedInUser.password);
         const isPasswordValid = await bcrypt.compare(currentPassword, loggedInUser.password);
         if(!isPasswordValid) throw new Error('Please enter correct current password');
         if(!validator.isStrongPassword(newPassword)) throw new Error('Please enter a strong password');
-        const hashedNewPass = await bcrypt.hash(newPassword, 10);
-        loggedInUser.password = hashedNewPass;
+        loggedInUser.password = newPassword;
         await loggedInUser.save();
         return res.json({
             message: 'Password updated successfully',

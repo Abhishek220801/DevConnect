@@ -12,14 +12,14 @@ authRouter.post('/signup', async (req, res) => {
 
         // encrypt the password 
         const {firstName, lastName, emailId, password} = req.body;
-        const hashedPassword = await bcrypt.hash(password, 10);
+        if(!validator.isEmail(emailId)) throw new Error('Please enter a valid email address');
 
         // create instance of user model
         const user = new User({
             firstName,
             lastName,
             emailId,
-            password: hashedPassword
+            password
         });
         
         await user.save();
@@ -33,14 +33,14 @@ authRouter.post('/signup', async (req, res) => {
 authRouter.post('/login', async (req, res) => {
     try{
         const {emailId, password} = req.body;
-        if(!validator.isEmail(emailId)) throw new Error('Please enter a valid email address');
         const foundUser = await User.findOne({emailId}).select('+password')
         if(!foundUser){
             throw new Error('Invalid credentials')
         }
+        console.log(foundUser.password);
         const isPasswordValid = await foundUser.validatePassword(password); 
         if(isPasswordValid){
-            const token = await foundUser.getJWT();
+            let token = await foundUser.getJWT();
             res.cookie('token', token, {
                 expires: new Date(Date.now() + 8 * 3600000),
             });

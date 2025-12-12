@@ -4,13 +4,20 @@ import User from '../models/user.js';
 export const userAuth = async (req, res, next) => {
     try{
         // Read the token from the req cookies
-        const {token} = req.cookies;
-        if(!token) throw new Error('Token is not valid');
-        const decodedObj = jwt.verify(token, process.env.JWT_SECRET);
-        const {_id} = decodedObj;
-        const user = await User.findById(_id);
-        if(!user)
-            throw new Error('User not found');
+        let token = req.cookies?.token;
+        // console.log(token)
+        if(!token){
+            const authHeader = req.header('Authorization');
+            if(!authHeader?.startsWith('Bearer ')){
+                token = authHeader.replace("Bearer ", "").trim();
+            }
+        };
+        if (!token) throw new Error("Authentication required");
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        // console.log(decoded);
+        const user = await User.findById(decoded._id).select('+password');
+        if(!user) throw new Error('User not found');
+        console.log(user);
         req.user = user;
         next();
     }

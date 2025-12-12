@@ -1,4 +1,5 @@
 import express, { request } from "express"
+import mongoose from "mongoose"
 const requestRouter = express.Router()
 
 import { userAuth } from "../middlewares/auth.js"
@@ -7,9 +8,32 @@ import ConnectionRequest from "../models/connectionRequest.js"
 
 requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
   try {
+    console.log("SEND endpoint hit by:", req.user._id) // confirm route
     const fromUserId = req.user._id
     const toUserId = req.params.toUserId
     const status = req.params.status
+
+    console.log("toUserId param:", toUserId)
+
+    // validate ObjectId first
+    if (!mongoose.isValidObjectId(toUserId)) {
+      return res.status(400).json({ message: "Invalid user id format" })
+    }
+
+    // prevent self-like
+    if (fromUserId.toString() === toUserId.toString()) {
+      return res
+        .status(400)
+        .json({ message: "Cannot send request to yourself" })
+    }
+
+    // safe fetch
+    const toUser = await User.findById(toUserId).select("+_id firstName") // minimal fetch
+    console.log("toUser (db result):", toUser) // will log null if not found
+
+    if (!toUser) {
+      return res.status(404).json({ message: "User not found" })
+    }
 
     const allowedStatus = ["like", "pass"]
     if (!allowedStatus.includes(status)) {
@@ -21,18 +45,15 @@ requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
     // if there is an existing connectionRequest
     const existingConnectionRequest = await ConnectionRequest.findOne({
       $or: [
-        { fromUserId: toUserId },
-        { fromUserId: toUserId, toUserId: fromUserId },
+        { fromUserId, toUserId }, // You -> Them
+        { fromUserId: toUserId, toUserId: fromUserId }, // Them -> You
       ],
     })
 
     if (existingConnectionRequest) {
-      return res.status(400).send({ message: "Connection Request Already Exists!" })
-    }
-
-    const toUser = await User.findById(toUserId)
-    if (!toUser) {
-      return res.status(404).json({ message: "User not found" })
+      return res
+        .status(400)
+        .json({ message: "Connection Request Already Exists!" })
     }
 
     const connectionRequest = new ConnectionRequest({
@@ -47,7 +68,8 @@ requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
       data,
     })
   } catch (err) {
-    res.status(400).send("ERROR : " + err.message)
+    console.error("Send endpoint error:", err)
+    return res.status(500).json({ message: "Server error", error: err.message })
   }
 })
 
