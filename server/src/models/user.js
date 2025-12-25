@@ -65,7 +65,10 @@ const userSchema = new Schema({
     emailVerified: {
         type: Boolean,
         default: false,
-    }
+    },
+    location: {
+        
+    }, currentRole: {}, github: {}, linkedin: {}, twitter: {}
 }, {timestamps: true, toJSON: {virtuals: true}, toObject: {virtuals: true}})
 
 userSchema.index({firstName: 1, lastName: 1})

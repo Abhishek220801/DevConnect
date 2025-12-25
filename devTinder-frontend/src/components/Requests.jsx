@@ -1,11 +1,13 @@
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 import { useEffect, useState } from "react";
+import { toast } from 'react-toastify'
+import { useSelector } from "react-redux";
 
 const Requests = () => {
   const [message, setMessage] = useState("");
   const [requests, setRequests] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); 
 
   const getRequests = async () => {
   try {
@@ -22,13 +24,22 @@ const Requests = () => {
 
     setRequests(res?.data?.data || []);
   } catch (err) {
-    console.error(err);
+    toast.error(err);
     setMessage("Something went wrong");
   } finally {
     setLoading(false);
   }
 };
 
+const reviewRequest = async (status, requestId) => {
+  try {
+    const res = await axios.post(BASE_URL + '/request/review/'+status+'/'+requestId, {}, {withCredentials: true});
+    const newArray = requests.filter((r) => r._id!==requestId);
+    setRequests(newArray);
+  } catch (err) {
+    toast.error(err)
+  }
+}
 
   useEffect(() => {
     getRequests();
@@ -89,10 +100,10 @@ if (message) {
 
             {/* Right: actions */}
             <div className="flex gap-2">
-              <button className="px-4 py-1.5 rounded-lg bg-green-600 hover:bg-green-700 transition text-sm">
+              <button className="px-4 py-1.5 rounded-lg bg-green-600 hover:bg-green-700 transition text-sm" onClick={()=> reviewRequest('accept', _id)}>
                 Accept
               </button>
-              <button className="px-4 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 transition text-sm">
+              <button className="px-4 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 transition text-sm" onClick={()=> reviewRequest('reject', _id)}>
                 Reject
               </button>
             </div>

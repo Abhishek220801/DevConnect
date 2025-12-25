@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import {BASE_URL} from '../utils/constants'
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const Connections = () => {
   let [connections, setConnections] = useState([]);
@@ -13,7 +14,7 @@ const Connections = () => {
         );
         setConnections(res?.data?.data || []);
       } catch(err){
-        console.error(err)
+        toast.error(err)
       } finally{
         setIsLoading(false);
       }
