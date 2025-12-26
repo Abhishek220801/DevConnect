@@ -67,8 +67,23 @@ const userSchema = new Schema({
         default: false,
     },
     location: {
-        
-    }, currentRole: {}, github: {}, linkedin: {}, twitter: {}
+        type: String,
+    }, 
+    currentRole: {
+        type: String,
+    }, 
+    company: {
+        type: String,
+    }, 
+    github: {
+        type: String, 
+    }, 
+    linkedin: {
+        type: String, 
+    },
+    twitter: {
+        type: String, 
+    }
 }, {timestamps: true, toJSON: {virtuals: true}, toObject: {virtuals: true}})
 
 userSchema.index({firstName: 1, lastName: 1})

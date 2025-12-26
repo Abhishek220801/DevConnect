@@ -8,57 +8,92 @@ import { toast } from "react-toastify"
 
 const Login = () => {
   const [emailId, setEmailId] = useState("abhishek@gmail.com")
-  const [password, setPassword] = useState("Abhi@123");
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [password, setPassword] = useState("Abhi@123")
+  const [firstName, setFirstName] = useState("")
+  const [lastName, setLastName] = useState("")
+  const [isLoginForm, setIsLoginForm] = useState(true)
+
+  const [error, setError] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const user = useSelector((store) => store.user);
+  const user = useSelector((store) => store.user)
 
-  useEffect(() => { 
-    if(user) navigate('/');
-  }, [user, navigate]);
+  useEffect(() => {
+    if (user) navigate("/")
+  }, [user, navigate])
 
-  const handleLogin = async () => {
-    setError("");
-    setIsLoading(true);
-      try {
+  const handleSubmit = async () => {
+    setError("")
+    setIsLoading(true)
+    try {
+      if(isLoginForm){
         const res = await axios.post(
           BASE_URL + "/login",
-          {
-            emailId,
-            password,
-          },
+          {emailId, password},
           { withCredentials: true }
         )
-        console.log('user data ', res.data)
         dispatch(addUser(res.data))
-        navigate('/feed');
-      } catch (err) {
-        toast.error(err.response?.data?.message || "Wrong credentials, Please try again.")
-        console.error(err);
-      } finally{
-        setIsLoading(false);
+        navigate("/feed")
+      } else {
+        await axios.post(
+          BASE_URL + "/signup",
+          { firstName, lastName, emailId, password },
+          { withCredentials: true }
+        )
+        toast.success("Account created. Please login.");
+        setIsLoginForm(true);
       }
+    } catch (err) {
+      toast.error(
+        err.response?.data?.message || err.response.data || "Bad credentials, Please try again."
+      )
+    } finally {
+      setIsLoading(false)
     }
+  }
 
-    const handleKeyPress = (e) => {
-      if(e.key === 'Enter') handleLogin();
-    }
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") handleSubmit()
+  }
 
   return (
     <div className="flex justify-center my-10">
       <fieldset className="fieldset bg-base-300 border-base-300 rounded-box w-xs border p-4 ">
-        <legend className="fieldset-legend">Login</legend>
+        <legend className="fieldset-legend">
+          {isLoginForm ? "Login" : "Sign Up"}
+        </legend>
+
+        {!isLoginForm && (
+          <>
+            <label className="label">First Name</label>
+            <input
+              className="input"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value) + setError("")}
+              onKeyDown={handleKeyDown}
+              disabled={isLoading}
+            />
+
+            <label className="label">Last Name</label>
+            <input
+              className="input"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value) + setError("")}
+              onKeyDown={handleKeyDown}
+              disabled={isLoading}
+            />
+          </>
+        )}
 
         <label className="label">Email</label>
         <input
           type="email"
           className="input"
-          placeholder="Email"
           value={emailId}
-          onChange={(e) => setEmailId(e.target.value) + setError('')}
-          onKeyPress={handleKeyPress}
+          onChange={(e) => setEmailId(e.target.value) + setError("")}
+          onKeyDown={handleKeyDown}
           disabled={isLoading}
         />
 
@@ -66,12 +101,9 @@ const Login = () => {
         <input
           type="password"
           className="input"
-          placeholder="Password"
           value={password}
-          onChange={
-            (e) => setPassword(e.target.value) + setError('')
-          }
-          onKeyPress={handleKeyPress}
+          onChange={(e) => setPassword(e.target.value) + setError("")}
+          onKeyDown={handleKeyDown}
           disabled={isLoading}
         />
 
@@ -81,16 +113,30 @@ const Login = () => {
           </div>
         )}
 
-        <button className="btn btn-neutral mt-4 w-full" onClick={handleLogin} disabled={isLoading}>
+        <button
+          className="btn btn-neutral mt-4 w-full"
+          onClick={handleSubmit}
+          disabled={isLoading}
+        >
           {isLoading ? (
             <>
               <span className="loading loading-spinner loading-sm"></span>
-              Logging in...
+              {isLoginForm ? "Logging in..." : "Signing up..."}
             </>
           ) : (
-            "Login"
+            isLoginForm ? "Login" : "Sign Up"
           )}
         </button>
+
+        <p className="m-auto text-gray-400">
+          {isLoginForm ? "New here? " : "Already registered? "}
+          <span
+            className="hover:underline cursor-pointer"
+            onClick={() => setIsLoginForm(!isLoginForm)}
+          >
+            {isLoginForm ? "Register" : "Login"}
+          </span>
+        </p>
       </fieldset>
     </div>
   )

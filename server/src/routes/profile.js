@@ -17,23 +17,31 @@ profileRouter.get('/', userAuth, async(req, res) => {
 
 profileRouter.patch('/edit', userAuth, async (req, res) => {
     try{
-        if(!validateProfileEditData(req)) throw new Error('Invalid Edit Request');
+        if(!validateProfileEditData(req)) {
+            return res.status(400).json({message: 'Invalid Edit Request'});
+        }
         const loggedInUser = req.user; 
         const updates = req.body || {};
         // Reject empty update
         if (Object.keys(updates).length === 0) {
-            return res.status(400).json({ message: 'No fields provided to update.' });
+            return res.status(400).json({ message: 'No fields provided' });
         }
-        Object.keys(req.body).forEach((key) => (loggedInUser[key]!=req.body[key]) ? loggedInUser[key] = req.body[key]: null);
+        Object.keys(updates).forEach((key) => {
+            if (updates[key] !== undefined) {
+                loggedInUser[key] = updates[key];
+            }
+        });
         await loggedInUser.save();
-        res.json({
+        return res.json({
             message: `${loggedInUser.firstName}, your profile was updated successfully!`,
             data: loggedInUser,
         })
     } catch(err){
-        throw new Error("Edit request failed");
+        return res.status(400).json({
+            message: err.message || "Edit request failed",
+         });
     }
-})
+});
 
 profileRouter.patch('/password', userAuth, async (req, res) => {
     try {

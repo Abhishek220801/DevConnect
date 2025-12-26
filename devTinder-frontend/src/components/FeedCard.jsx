@@ -1,23 +1,31 @@
 import { useState } from 'react';
 import { Heart, X, Code2, MapPin, Briefcase, Github, Linkedin, Twitter } from 'lucide-react';
+import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { BASE_URL } from '../utils/constants';
+import { removeUserFromFeed } from '../utils/FeedSlice';
 
-const FeedCard = ({ user, onAccept, onReject }) => {
-  const { firstName, lastName, about, skills, photoUrl, age, gender, location, currentRole, github, linkedin, twitter } = user;
+const FeedCard = ({ user }) => {
+  const { _id, firstName, lastName, about, skills, photoUrl, age, gender, location, currentRole, company, github, linkedin, twitter } = user;
   const [isFlipping, setIsFlipping] = useState(false);
 
-  const handleAccept = () => {
-    setIsFlipping(true);
-    setTimeout(() => onAccept(user), 300);
-  };
-
-  const handleReject = () => {
-    setIsFlipping(true);
-    setTimeout(() => onReject(user), 300);
+  const dispatch = useDispatch();
+  
+    const handleSendRequest = async (status) => {
+      if(isFlipping) return;
+      setIsFlipping(true);
+    try {
+      await axios.post(`${BASE_URL}/request/send/${status}/${_id}`, {}, {withCredentials: true});
+      setTimeout(() => dispatch(removeUserFromFeed(_id)), 300);
+    } catch (err) {
+      console.error(err);
+      setIsFlipping(false);
+    };
   };
 
   return (
     <div className={`w-full max-w-md transition-all duration-300 ${isFlipping ? 'scale-95 opacity-0' : 'scale-100 opacity-100'}`}>
-      <div className="relative bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900 rounded-3xl shadow-2xl overflow-hidden border border-purple-500/20">
+      <div className="relative bg-linear-to-br from-slate-900 via-purple-900/20 to-slate-900 rounded-3xl shadow-2xl overflow-hidden border border-purple-500/20">
         {/* Gradient Overlay on Image */}
         <div className="relative h-80 overflow-hidden">
           <img
@@ -25,7 +33,7 @@ const FeedCard = ({ user, onAccept, onReject }) => {
             alt={`${firstName}'s profile`}
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-slate-900 via-slate-900/50 to-transparent" />
           
           {/* Name Overlay */}
           <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
@@ -37,9 +45,9 @@ const FeedCard = ({ user, onAccept, onReject }) => {
                 {currentRole && (
                   <div className="flex items-center gap-2 text-purple-300 mb-2">
                     <Briefcase size={16} />
-                    <span className="text-sm font-medium">{currentRole}</span>
+                    <span className="text-sm font-medium">{currentRole} {company && `@${company}`}</span>
                   </div>
-                )}
+                )} 
                 {location && (
                   <div className="flex items-center gap-2 text-slate-300">
                     <MapPin size={14} />
@@ -120,25 +128,27 @@ const FeedCard = ({ user, onAccept, onReject }) => {
         <div className="p-6 pt-0">
           <div className="flex gap-4">
             <button
-              onClick={handleReject}
-              className="flex-1 group relative overflow-hidden bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-500 hover:to-pink-500 text-white font-semibold py-4 px-6 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-red-500/50 hover:scale-105 active:scale-95"
+              disabled={isFlipping}
+              onClick={() => handleSendRequest('pass', _id)}
+              className="flex-1 group relative overflow-hidden bg-linear-to-r from-red-600 to-pink-600 hover:from-red-500 hover:to-pink-500 text-white font-semibold py-4 px-6 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-red-500/50 hover:scale-105 active:scale-95"
             >
               <span className="relative z-10 flex items-center justify-center gap-2">
                 <X size={22} strokeWidth={2.5} />
                 <span>Pass</span>
               </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-red-400 to-pink-400 opacity-0 group-hover:opacity-20 transition-opacity" />
+              <div className="absolute inset-0 bg-linear-to-r from-red-400 to-pink-400 opacity-0 group-hover:opacity-20 transition-opacity" />
             </button>
             
             <button
-              onClick={handleAccept}
-              className="flex-1 group relative overflow-hidden bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-semibold py-4 px-6 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-green-500/50 hover:scale-105 active:scale-95"
+              disabled={isFlipping}
+              onClick={() => handleSendRequest('like', _id)}
+              className="flex-1 group relative overflow-hidden bg-linear-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-semibold py-4 px-6 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-green-500/50 hover:scale-105 active:scale-95"
             >
               <span className="relative z-10 flex items-center justify-center gap-2">
                 <Heart size={22} strokeWidth={2.5} />
                 <span>Connect</span>
               </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-400 opacity-0 group-hover:opacity-20 transition-opacity" />
+              <div className="absolute inset-0 bg-linear-to-r from-green-400 to-emerald-400 opacity-0 group-hover:opacity-20 transition-opacity" />
             </button>
           </div>
         </div>
