@@ -31,7 +31,7 @@ This project focuses on **backend architecture, authentication, data modeling, a
 - Developer discovery feed
 - Connection request system (like / pass)
 - Profile creation & editing
-- Pagination-ready APIs
+- Pagination-ready APIs (REST APIs)
 
 ### 🎨 Frontend (In Progress)
 - React-based UI
