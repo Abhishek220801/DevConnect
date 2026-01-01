@@ -16,42 +16,132 @@ profileRouter.get("/", userAuth, async (req, res) => {
   }
 })
 
+// profileRouter.patch(
+//   "/edit",
+//   userAuth,
+//   upload.single("photo"),
+//   async (req, res) => {
+//     try {
+//       if (!validateProfileEditData(req)) {
+//         return res.status(400).json({ message: "Invalid Edit Request" })
+//       }
+//       const loggedInUser = req.user
+//       const updates = req.body || {}
+//       // Reject empty update
+//       if (Object.keys(updates).length === 0 && !req.file) {
+//         return res.status(400).json({ message: "No fields provided" })
+//       }
+//       if(updates.skills && typeof updates.skills === 'string'){
+//         try{
+//           updates.skills = JSON.parse(updates.skills);
+//         } catch (e) {
+//           console.error('Skills parsing error:', e)
+//           updates.skills = []
+//         }
+//       }
+//       Object.keys(updates).forEach((key) => {
+//         if (updates[key] === undefined || updates[key] === '') return;
+//         if(Array.isArray(updates[key]) && updates[key].length === 0) return;
+//         loggedInUser[key] = updates[key];
+//       })
+//       if (req.file) {
+//         loggedInUser.photoUrl = `/uploads/${req.file.filename}`
+//       }
+//       await loggedInUser.save()
+//       return res.json({
+//         message: `${loggedInUser.firstName}, your profile was updated successfully!`,
+//         data: loggedInUser,
+//           })
+//     } catch (err) {
+//       console.error('Profile edit error:', err)
+//       return res.status(400).json({
+//         message: err.message || "Edit request failed",
+//       })
+//     }
+//   }
+// )
+
 profileRouter.patch(
   "/edit",
   userAuth,
   upload.single("photo"),
   async (req, res) => {
     try {
+      console.log('========== EDIT PROFILE REQUEST ==========')
+      console.log('User ID:', req.user._id)
+      console.log('Request body:', req.body)
+      console.log('Request file:', req.file)
+      console.log('=========================================')
+
       if (!validateProfileEditData(req)) {
         return res.status(400).json({ message: "Invalid Edit Request" })
       }
+      
       const loggedInUser = req.user
       const updates = req.body || {}
-      // Reject empty update
+      
       if (Object.keys(updates).length === 0 && !req.file) {
         return res.status(400).json({ message: "No fields provided" })
       }
-      if(updates.skills && typeof updates.skills === 'string'){
-        try{
-          updates.skills = JSON.parse(updates.skills);
-        } catch (e) {
+
+      // Parse skills
+      if ('skills' in updates) {
+        if (typeof updates.skills === 'string') {
+          try {
+            const parsed = JSON.parse(updates.skills)
+            updates.skills = Array.isArray(parsed) ? parsed : []
+          } catch (e) {
+            console.error('Skills parsing error:', e)
+            updates.skills = []
+          }
+        }
+        if (Array.isArray(updates.skills)) {
+          updates.skills = updates.skills
+            .filter(skill => skill && typeof skill === 'string' && skill.trim() !== '')
+            .map(skill => skill.trim())
+        } else {
           updates.skills = []
         }
       }
+
+      console.log('Parsed updates:', updates)
+
+      // Update fields
       Object.keys(updates).forEach((key) => {
-        if (updates[key] !== undefined) {
-          loggedInUser[key] = updates[key]
-        }
+        if (key === 'photoUrl') return // Skip photoUrl from body
+        loggedInUser[key] = updates[key]
       })
+
+      // Handle file upload
       if (req.file) {
-        loggedInUser.photoUrl = `/uploads/${req.file.filename}`
+        const photoPath = `/uploads/${req.file.filename}`
+        console.log('File uploaded! Setting photoUrl to:', photoPath)
+        loggedInUser.photoUrl = photoPath
       }
-      await loggedInUser.save()
+
+      console.log('User before save:', {
+        _id: loggedInUser._id,
+        firstName: loggedInUser.firstName,
+        photoUrl: loggedInUser.photoUrl,
+        skills: loggedInUser.skills
+      })
+
+      const savedUser = await loggedInUser.save()
+      
+      console.log('User after save:', {
+        _id: savedUser._id,
+        firstName: savedUser.firstName,
+        photoUrl: savedUser.photoUrl,
+        skills: savedUser.skills
+      })
+      
       return res.json({
-        message: `${loggedInUser.firstName}, your profile was updated successfully!`,
-        data: loggedInUser,
-          })
+        message: `${savedUser.firstName}, your profile was updated successfully!`,
+        data: savedUser,
+      })
     } catch (err) {
+      console.error('Profile edit error:', err)
+      console.error('Error stack:', err.stack)
       return res.status(400).json({
         message: err.message || "Edit request failed",
       })

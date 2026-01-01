@@ -30,15 +30,16 @@ const EditProfile = ({ user }) => {
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
 
+  const [originalData, setOriginalData] = useState({})
+
   useEffect(() => {
     if (!user) return
 
-    setFormData((prev) => ({
-      ...prev,
+    const userData = {
       firstName: user.firstName || "",
       lastName: user.lastName || "",
       emailId: user.emailId || "",
-      photoUrl: user.photoUrl || prev.photoUrl,
+      photoUrl: user.photoUrl || "",
       age: user.age || "",
       gender: user.gender || "",
       about: user.about || "",
@@ -49,7 +50,10 @@ const EditProfile = ({ user }) => {
       github: user.github || "",
       linkedin: user.linkedin || "",
       twitter: user.twitter || "",
-    }))
+    }
+
+    setFormData((prev) => ({ ...prev, ...userData }))
+    setOriginalData(userData)
   }, [user])
 
   const handleChange = (e) => {
@@ -98,53 +102,187 @@ const EditProfile = ({ user }) => {
     saveProfile()
   }
 
+  // const saveProfile = async () => {
+  //   try {
+  //     setError("")
+  //     setSuccess("")
+
+  //     const data = new FormData()
+
+  //     Object.entries(formData).forEach(([key, value]) => {
+  //       if (key === "photo" || key=== 'photoUrl') return
+  //       if(JSON.stringify(originalData[key]) === JSON.stringify(value)) return
+  //       if (value == null || value === "") return
+  //       if (Array.isArray(value) && value.length === 0) return
+
+  //       if (Array.isArray(value)) {
+  //         data.append(key, JSON.stringify(value))
+  //       } else {
+  //         data.append(key, value)
+  //       }
+  //     })
+  //     if (formData.photo) {
+  //       data.append("photo", formData.photo)
+  //     }
+
+  //     const hasUpdates = Array.from(data.keys()).length > 0
+  //     if (!hasUpdates && !formData.photo) {
+  //       setError("No changes detected")
+  //       return
+  //     }
+
+  //     const res = await axios.patch(BASE_URL + "/profile/edit", data, {
+  //       withCredentials: true,
+  //       headers: {
+  //         "Content-Type": "multipart/form-data",
+  //       },
+  //     })
+
+  //     dispatch(addUser(res?.data?.data))
+
+  //     const updatedData = {
+  //       firstName: res.data.data.firstName || "",
+  //       lastName: res.data.data.lastName || "",
+  //       emailId: res.data.data.emailId || "",
+  //       photoUrl: res.data.data.photoUrl || "",
+  //       age: res.data.data.age || "",
+  //       gender: res.data.data.gender || "",
+  //       about: res.data.data.about || "",
+  //       skills: res.data.data.skills || [],
+  //       location: res.data.data.location || "",
+  //       currentRole: res.data.data.currentRole || "",
+  //       company: res.data.data.company || "",
+  //       github: res.data.data.github || "",
+  //       linkedin: res.data.data.linkedin || "",
+  //       twitter: res.data.data.twitter || "",
+  //     }
+
+  //     setFormData((prev) => ({...updatedData, photo: null}))
+  //     setOriginalData(updatedData);
+  //     if (previewPhotoUrl) {
+  //       URL.revokeObjectURL(previewPhotoUrl)
+  //     }
+  //     setPreviewPhotoUrl("")
+  //     setSuccess("Profile updated successfully")
+  //   } catch (err) {
+  //     setError(
+  //       err?.response?.data?.message || "Something went wrong. Try again."
+  //     )
+  //   }
+  // }
+
   const saveProfile = async () => {
-    try {
-      setError("")
-      setSuccess("")
+  try {
+    console.log('========== SAVE PROFILE START ==========')
+    console.log('Current formData:', formData)
+    console.log('Current previewPhotoUrl:', previewPhotoUrl)
+    
+    setError("")
+    setSuccess("")
 
-      const data = new FormData()
+    const data = new FormData()
 
-      Object.entries(formData).forEach(([key, value]) => {
-        if (key === "photo") return
-        if (value == null || value === "") return
-        if (Array.isArray(value) && value.length === 0) return
+    const fieldsToSend = [
+      "firstName",
+      "lastName",
+      "emailId",
+      "age",
+      "gender",
+      "about",
+      "location",
+      "currentRole",
+      "company",
+      "github",
+      "linkedin",
+      "twitter",
+    ]
 
-        if (Array.isArray(value)) {
-          data.append(key, JSON.stringify(value))
-        } else {
-          data.append(key, value)
-        }
-      })
-      if (formData.photo) {
-        data.append("photo", formData.photo)
+    fieldsToSend.forEach((key) => {
+      const value = formData[key]
+      if (value !== undefined && value !== null) {
+        data.append(key, value)
+      } else {
+        data.append(key, "")
       }
+    })
 
-      const res = await axios.patch(BASE_URL + "/profile/edit", data, {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
+    const skills = formData.skills || []
+    console.log("Skills to send:", skills)
+    data.append("skills", JSON.stringify(skills))
 
-      dispatch(addUser(res?.data?.data))
-      if (previewPhotoUrl) {
-        URL.revokeObjectURL(previewPhotoUrl)
-      }
-      setPreviewPhotoUrl("")
-      setFormData((prev) => ({
-        ...prev,
-        photo: null,
-        photoUrl: res.data.data.photoUrl,
-        skills: res.data.data.skills || [],
-      }))
-      setSuccess("Profile updated successfully")
-    } catch (err) {
-      setError(
-        err?.response?.data?.message || "Something went wrong. Try again."
-      )
+    if (formData.photo) {
+      console.log("Sending photo file:", formData.photo.name, formData.photo.size, "bytes")
+      data.append("photo", formData.photo)
+    } else {
+      console.log("No photo file to send")
     }
+
+    console.log("FormData entries:")
+    for (let [key, value] of data.entries()) {
+      if (value instanceof File) {
+        console.log(key, ": [File]", value.name, value.size, "bytes")
+      } else {
+        console.log(key, ":", value)
+      }
+    }
+
+    console.log("Sending request to:", BASE_URL + "/profile/edit")
+
+    const res = await axios.patch(BASE_URL + "/profile/edit", data, {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
+
+    console.log("========== SERVER RESPONSE ==========")
+    console.log("Full response:", res.data)
+    console.log("PhotoUrl from server:", res.data.data.photoUrl)
+    console.log("Skills from server:", res.data.data.skills)
+    console.log("====================================")
+
+    // Update Redux store
+    dispatch(addUser(res?.data?.data))
+
+    const updatedData = {
+      firstName: res.data.data.firstName || "",
+      lastName: res.data.data.lastName || "",
+      emailId: res.data.data.emailId || "",
+      photoUrl: res.data.data.photoUrl || "",
+      age: res.data.data.age || "",
+      gender: res.data.data.gender || "",
+      about: res.data.data.about || "",
+      skills: res.data.data.skills || [],
+      location: res.data.data.location || "",
+      currentRole: res.data.data.currentRole || "",
+      company: res.data.data.company || "",
+      github: res.data.data.github || "",
+      linkedin: res.data.data.linkedin || "",
+      twitter: res.data.data.twitter || "",
+    }
+
+    // Clear preview
+    if (previewPhotoUrl) {
+      console.log("Clearing preview URL:", previewPhotoUrl)
+      URL.revokeObjectURL(previewPhotoUrl)
+    }
+    setPreviewPhotoUrl("")
+
+    console.log("Setting formData to:", updatedData)
+    setFormData({ ...updatedData, photo: null })
+
+    console.log("========== SAVE PROFILE END ==========")
+    setSuccess("Profile updated successfully")
+  } catch (err) {
+    console.error("========== SAVE PROFILE ERROR ==========")
+    console.error("Error:", err)
+    console.error("Error response:", err.response?.data)
+    console.error("Error status:", err.response?.status)
+    setError(
+      err?.response?.data?.message || "Something went wrong. Try again."
+    )
   }
+}
 
   useEffect(() => {
     return () => {
@@ -153,18 +291,27 @@ const EditProfile = ({ user }) => {
       }
     }
   }, [previewPhotoUrl])
-  
-  useEffect(() => {
-    return () => {
-      if (previewPhotoUrl) {
-        URL.revokeObjectURL(previewPhotoUrl)
-      }
-    }
-  }, [previewPhotoUrl])
-  
+
   if (!user) return null
 
+  // useEffect(() => {
+  //   return () => {
+  //     if (previewPhotoUrl) {
+  //       URL.revokeObjectURL(previewPhotoUrl)
+  //     }
+  //   }
+  // }, [previewPhotoUrl])
+
+  // if (!user) return null
+
   const displayPhotoUrl = previewPhotoUrl || formData.photoUrl
+
+  console.log('========== COMPONENT RENDER ==========')
+console.log('previewPhotoUrl:', previewPhotoUrl)
+console.log('formData.photoUrl:', formData.photoUrl)
+console.log('displayPhotoUrl:', displayPhotoUrl)
+console.log('formData.photo:', formData.photo)
+console.log('====================================')
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-10">
@@ -208,25 +355,16 @@ const EditProfile = ({ user }) => {
             </div>
           ))}
           <div className="mb-4">
-          <label className="text-sm text-gray-400 block mb-1">
-            Profile Photo
-          </label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="file-input file-input-bordered w-full"
-          />
-          {displayPhotoUrl && (
-            <div className="mt-2">
-                <img 
-                  src={displayPhotoUrl.startsWith('blob:') ? displayPhotoUrl : `http://localhost:7777${displayPhotoUrl}`}
-                  alt="Preview" 
-                  className="w-20 h-20 rounded-full object-cover border-2 border-purple-500"
-                />
-              </div>
-          )}
-      </div>
+            <label className="text-sm text-gray-400 block mb-1">
+              Profile Photo
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="file-input file-input-bordered w-full"
+            />
+          </div>
           {/* <input
             type="text"
             name="photoUrl"
@@ -236,14 +374,16 @@ const EditProfile = ({ user }) => {
             className="input input-bordered w-full h-11"
           /> */}
           <div className="mb-4">
-          <label className="text-sm text-gray-400 block mb-1">Gender</label>
+            <label className="text-sm text-gray-400 block mb-1">Gender</label>
             <select
               name="gender"
               value={formData.gender}
               onChange={handleChange}
               className="select select-bordered w-full"
             >
-              <option value="" disabled>Select gender</option>
+              <option value="" disabled>
+                Select gender
+              </option>
               <option value="male">Male</option>
               <option value="female">Female</option>
               <option value="other">Other</option>
@@ -256,7 +396,7 @@ const EditProfile = ({ user }) => {
               name="about"
               value={formData.about}
               onChange={handleChange}
-              className="textarea textarea-bordered w-full min-h-[100px]"
+              className="textarea textarea-bordered w-full min-h-25"
             />
           </div>
 
@@ -269,12 +409,12 @@ const EditProfile = ({ user }) => {
               value={formData.skills.join(", ")}
               onChange={(e) => {
                 const skillsArray = e.target.value
-                  .split(',')
+                  .split(",")
                   .map((s) => s.trim())
                   .filter(Boolean)
                 setFormData((prev) => ({
                   ...prev,
-                  skills: skillsArray
+                  skills: skillsArray,
                 }))
               }}
               className="input input-bordered w-full h-11"
@@ -305,6 +445,7 @@ const EditProfile = ({ user }) => {
             Live Preview
           </div>
           <FeedCard
+            key={displayPhotoUrl}
             user={{
               ...formData,
               photoUrl: displayPhotoUrl,

@@ -68,21 +68,27 @@ const userSchema = new Schema({
     },
     location: {
         type: String,
+        default: '',
     }, 
     currentRole: {
         type: String,
+        default: '',
     }, 
     company: {
         type: String,
+        default: '',
     }, 
     github: {
         type: String, 
+        default: '',
     }, 
     linkedin: {
         type: String, 
+        default: '',
     },
     twitter: {
         type: String, 
+        default: '',
     }
 }, {timestamps: true, toJSON: {virtuals: true}, toObject: {virtuals: true}})
 
