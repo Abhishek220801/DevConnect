@@ -34,7 +34,7 @@ This project focuses on **backend architecture, authentication, data modeling, a
 - Profile creation & editing
 - Pagination-ready APIs (REST APIs)
 
-### 🎨 Frontend (In Progress)
+### 🎨 Frontend 
 - React-based UI
 - Feed card architecture
 - Profile preview & edit flow
