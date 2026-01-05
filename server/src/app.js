@@ -13,7 +13,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const app = express();
-const port = 7777;
+const port = process.env.PORT || 7777;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -29,18 +29,17 @@ app.use(express.urlencoded({extended: false}));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use(cors({    
-  origin: 'http://13.235.87.89/',
   credentials: true,
 }));
 
-app.use("/user", userAuth);
+app.use("/user", userAuth); 
 
 app.use('/', authRouter);
 app.use('/profile', profileRouter);
 app.use('/request', requestRouter);
 app.use('/user', userRouter);
 
+connectDB();
 app.listen(port, () => {
-  connectDB();
   console.log(`Server is listening on port ${port}`);
 });
