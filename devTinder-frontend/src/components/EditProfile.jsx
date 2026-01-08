@@ -42,6 +42,7 @@ const EditProfile = ({ user }) => {
       lastName: user.lastName || "",
       emailId: user.emailId || "",
       photoUrl: user.photoUrl || "",
+      photo: null,
       age: user.age || "",
       gender: user.gender || "",
       about: user.about || "",
@@ -88,11 +89,9 @@ const EditProfile = ({ user }) => {
     }))
 
     // Create preview URL
-    if (previewPhotoUrl) {
-      URL.revokeObjectURL(previewPhotoUrl)
-    }
-    const previewUrl = URL.createObjectURL(file)
-    setPreviewPhotoUrl(previewUrl)
+    if (previewPhotoUrl) URL.revokeObjectURL(previewPhotoUrl)
+    const blobUrl = URL.createObjectURL(file)
+    setPreviewPhotoUrl(blobUrl)
     setError("")
   }
 
@@ -105,85 +104,15 @@ const EditProfile = ({ user }) => {
     saveProfile()
   }
 
-  // const saveProfile = async () => {
-  //   try {
-  //     setError("")
-  //     setSuccess("")
-
-  //     const data = new FormData()
-
-  //     Object.entries(formData).forEach(([key, value]) => {
-  //       if (key === "photo" || key=== 'photoUrl') return
-  //       if(JSON.stringify(originalData[key]) === JSON.stringify(value)) return
-  //       if (value == null || value === "") return
-  //       if (Array.isArray(value) && value.length === 0) return
-
-  //       if (Array.isArray(value)) {
-  //         data.append(key, JSON.stringify(value))
-  //       } else {
-  //         data.append(key, value)
-  //       }
-  //     })
-  //     if (formData.photo) {
-  //       data.append("photo", formData.photo)
-  //     }
-
-  //     const hasUpdates = Array.from(data.keys()).length > 0
-  //     if (!hasUpdates && !formData.photo) {
-  //       setError("No changes detected")
-  //       return
-  //     }
-
-  //     const res = await axios.patch(BASE_URL + "/profile/edit", data, {
-  //       withCredentials: true,
-  //       headers: {
-  //         "Content-Type": "multipart/form-data",
-  //       },
-  //     })
-
-  //     dispatch(addUser(res?.data?.data))
-
-  //     const updatedData = {
-  //       firstName: res.data.data.firstName || "",
-  //       lastName: res.data.data.lastName || "",
-  //       emailId: res.data.data.emailId || "",
-  //       photoUrl: res.data.data.photoUrl || "",
-  //       age: res.data.data.age || "",
-  //       gender: res.data.data.gender || "",
-  //       about: res.data.data.about || "",
-  //       skills: res.data.data.skills || [],
-  //       location: res.data.data.location || "",
-  //       currentRole: res.data.data.currentRole || "",
-  //       company: res.data.data.company || "",
-  //       github: res.data.data.github || "",
-  //       linkedin: res.data.data.linkedin || "",
-  //       twitter: res.data.data.twitter || "",
-  //     }
-
-  //     setFormData((prev) => ({...updatedData, photo: null}))
-  //     setOriginalData(updatedData);
-  //     if (previewPhotoUrl) {
-  //       URL.revokeObjectURL(previewPhotoUrl)
-  //     }
-  //     setPreviewPhotoUrl("")
-  //     setSuccess("Profile updated successfully")
-  //   } catch (err) {
-  //     setError(
-  //       err?.response?.data?.message || "Something went wrong. Try again."
-  //     )
-  //   }
-  // }
-
   const saveProfile = async () => {
+    console.log("========== SAVE PROFILE START ==========")
     try {
-      console.log("========== SAVE PROFILE START ==========")
       setError("")
       setSuccess("")
 
       const data = new FormData()
 
-      // Add all text fields
-      const fieldsToSend = [
+      const fields = [
         "firstName",
         "lastName",
         "emailId",
@@ -198,18 +127,12 @@ const EditProfile = ({ user }) => {
         "twitter",
       ]
 
-      fieldsToSend.forEach((key) => {
-        const value = formData[key]
-        if (value !== undefined && value !== null && value !== "") {
-          data.append(key, value)
-        }
+      fields.forEach((key) => {
+        if (formData[key]) data.append(key, formData[key])
       })
 
-      // Add skills
-      const skills = formData.skills || []
-      data.append("skills", JSON.stringify(skills))
+      data.append("skills", JSON.stringify(formData.skills || []))
 
-      // Add photo file if exists
       if (formData.photo) {
         console.log("Uploading photo:", formData.photo.name)
         data.append("photo", formData.photo)
@@ -227,42 +150,23 @@ const EditProfile = ({ user }) => {
 
       // Update local state with server response
       const updatedData = {
-        firstName: res.data.data.firstName || "",
-        lastName: res.data.data.lastName || "",
-        emailId: res.data.data.emailId || "",
-        photoUrl: res.data.data.photoUrl || "", // This now has /uploads/xxx.jpg
-        age: res.data.data.age || "",
-        gender: res.data.data.gender || "",
-        about: res.data.data.about || "",
-        skills: res.data.data.skills || [],
-        location: res.data.data.location || "",
-        currentRole: res.data.data.currentRole || "",
-        company: res.data.data.company || "",
-        github: res.data.data.github || "",
-        linkedin: res.data.data.linkedin || "",
-        twitter: res.data.data.twitter || "",
+        ...res.data.data,
+        photo: null,
       }
 
       // Clean up preview blob URL
-      if (previewPhotoUrl) {
-        URL.revokeObjectURL(previewPhotoUrl)
-      }
+      if (previewPhotoUrl) URL.revokeObjectURL(previewPhotoUrl)
+      setPreviewPhotoUrl("")
       const newPhotoUrl = res.data.data.photoUrl
 
       setFormData((prev) => ({
         ...prev,
         ...updatedData,
-        photoUrl: newPhotoUrl || prev.photoUrl,
+        photoUrl: newPhotoUrl,
         photo: null,
       }))
 
-      if (newPhotoUrl && previewPhotoUrl) {
-        URL.revokeObjectURL(previewPhotoUrl)
-        setPreviewPhotoUrl("")
-      }
-
       setOriginalData(updatedData) // Update original to prevent "no changes" on next save
-
       setSuccess("Profile updated successfully")
       console.log("========== SAVE PROFILE END ==========")
     } catch (err) {
@@ -275,32 +179,13 @@ const EditProfile = ({ user }) => {
 
   useEffect(() => {
     return () => {
-      if (previewPhotoUrl) {
-        URL.revokeObjectURL(previewPhotoUrl)
-      }
+      if (previewPhotoUrl) URL.revokeObjectURL(previewPhotoUrl)
     }
   }, [previewPhotoUrl])
 
   if (!user) return null
 
-  // useEffect(() => {
-  //   return () => {
-  //     if (previewPhotoUrl) {
-  //       URL.revokeObjectURL(previewPhotoUrl)
-  //     }
-  //   }
-  // }, [previewPhotoUrl])
-
-  // if (!user) return null
-
   const displayPhotoUrl = previewPhotoUrl || formData.photoUrl
-
-  console.log("========== COMPONENT RENDER ==========")
-  console.log("previewPhotoUrl:", previewPhotoUrl)
-  console.log("formData.photoUrl:", formData.photoUrl)
-  console.log("displayPhotoUrl:", displayPhotoUrl)
-  console.log("formData.photo:", formData.photo)
-  console.log("====================================")
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-10">
@@ -354,14 +239,6 @@ const EditProfile = ({ user }) => {
               className="file-input file-input-bordered w-full"
             />
           </div>
-          {/* <input
-            type="text"
-            name="photoUrl"
-            placeholder="Or paste image URL"
-            value={formData.photoUrl}
-            onChange={handleChange}
-            className="input input-bordered w-full h-11"
-          /> */}
           <div className="mb-4">
             <label className="text-sm text-gray-400 block mb-1">Gender</label>
             <select
@@ -370,12 +247,12 @@ const EditProfile = ({ user }) => {
               onChange={handleChange}
               className="select select-bordered w-full"
             >
-              <option value="" disabled>
+              <option value="" disabled selected>
                 Select gender
               </option>
               <option value="male">Male</option>
               <option value="female">Female</option>
-              <option value="other">Other</option>
+              <option value="preferNotToSay">Prefer not to say</option>
             </select>
           </div>
 
@@ -430,9 +307,6 @@ const EditProfile = ({ user }) => {
 
         {/* PREVIEW (READ-ONLY) */}
         <div className="sticky top-24">
-          <div className="mb-2 text-center text-sm text-gray-4000">
-            Live Preview
-          </div>
           <FeedCard
             user={{
               ...formData,

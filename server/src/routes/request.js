@@ -1,4 +1,4 @@
-import express, { request } from "express"
+import express from "express"
 import mongoose from "mongoose"
 const requestRouter = express.Router()
 
@@ -8,12 +8,9 @@ import ConnectionRequest from "../models/connectionRequest.js"
 
 requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
   try {
-    console.log("SEND endpoint hit by:", req.user._id) // confirm route
     const fromUserId = req.user._id;
     const toUserId = req.params.toUserId;
     const status = req.params.status;
-
-    console.log("toUserId param:", toUserId);
 
     // validate ObjectId first
     if (!mongoose.isValidObjectId(toUserId)) {

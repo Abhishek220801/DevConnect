@@ -40,10 +40,9 @@ const userSchema = new Schema({
     gender: {
         type: String,
         enum: {
-            values: ["male", "female", "other"],
+            values: ["male", "female", "preferNotToSay"],
             message: '{VALUE} is not a valid gender type',
-        },
-        default: "male",
+        }
     },
     photoUrl: {
         type: String,
@@ -81,14 +80,23 @@ const userSchema = new Schema({
     github: {
         type: String, 
         default: '',
+        validate(value){
+            if(value && !validator.isURL(value)) throw new Error('Invalid Photo URL: ' + value);
+        },
     }, 
     linkedin: {
         type: String, 
         default: '',
+        validate(value){
+            if(value && !validator.isURL(value)) throw new Error('Invalid Photo URL: ' + value);
+        },
     },
     twitter: {
         type: String, 
         default: '',
+        validate(value){
+            if(value && !validator.isURL(value)) throw new Error('Invalid Photo URL: ' + value);
+        },
     }
 }, {timestamps: true, toJSON: {virtuals: true}, toObject: {virtuals: true}})
 

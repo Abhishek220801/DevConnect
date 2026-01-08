@@ -11,7 +11,7 @@ import {
 } from "lucide-react"
 import axios from "axios"
 import { useDispatch } from "react-redux"
-import { BASE_URL } from "../utils/constants"
+import { BASE_URL, STATIC_URL } from "../utils/constants"
 import { removeUserFromFeed } from "../utils/FeedSlice"
 import { useEffect } from "react"
 
@@ -42,19 +42,24 @@ const FeedCard = ({ user }) => {
 }, [])
 
   const getPhotoUrl = (photoUrl) => {
-    if (!photoUrl) return "https://geographyandyou.com/images/user-profile.png"
+  if (!photoUrl) return "https://geographyandyou.com/images/user-profile.png"
 
-    // If it's already a full URL (http/https), return as-is
-    if (photoUrl.startsWith("http")) return photoUrl
-
-    // If it's a relative path starting with /uploads/, prepend BASE_URL
-    if (photoUrl.startsWith("/uploads/")) {
-      return `${BASE_URL}${photoUrl}`
-    }
-
-    // Fallback: return as-is
+  // explicitly allow blob ONLY for preview
+  if (photoUrl.startsWith("blob:")) {
     return photoUrl
   }
+
+  if (photoUrl.startsWith("/uploads/")) {
+    return `${STATIC_URL}${photoUrl}`
+  }
+
+  if (photoUrl.startsWith("http")) {
+    return photoUrl
+  }
+
+  return "https://geographyandyou.com/images/user-profile.png"
+}
+
 
   const handleSendRequest = async (status) => {
     if (isFlipping) return
@@ -85,6 +90,7 @@ const FeedCard = ({ user }) => {
             src={getPhotoUrl(photoUrl)}
             alt={`${firstName}'s profile`}
             className="w-full h-full object-cover"
+            crossOrigin="anonymous"
           />
           <div className="absolute inset-0 bg-linear-to-t from-slate-900 via-slate-900/50 to-transparent" />
 
@@ -95,7 +101,7 @@ const FeedCard = ({ user }) => {
                 <h2 className="text-3xl font-bold mb-1">
                   {firstName} {lastName || ""} {age}
                 </h2>
-                {currentRole && (
+                {(currentRole || company) && (
                   <div className="flex items-center gap-2 text-purple-300 mb-2">
                     <Briefcase size={16} />
                     <span className="text-sm font-medium">

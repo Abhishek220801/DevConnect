@@ -22,7 +22,7 @@ const Login = () => {
 
   useEffect(() => {
     if (user) navigate("/")
-  }, [user, navigate])
+  }, [])
 
   const handleSubmit = async () => {
     setError("")
@@ -35,7 +35,7 @@ const Login = () => {
           { withCredentials: true }
         )
         dispatch(addUser(res.data))
-        navigate("/feed")
+        navigate("/")
       } else {
         await axios.post(
           BASE_URL + "/signup",
