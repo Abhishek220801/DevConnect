@@ -10,7 +10,10 @@
 
 DevTinder goes beyond simple CRUD apps — it focuses on **backend architecture, authentication, real-time features, AWS deployment, and production-ready workflows**, with a polished React frontend.
 
-🔗 **Live Demo:** [https://meetdev.online/](https://meetdev.online/)  
+🔗 **Live Demo:** [https://meetdev.online/]
+<a href="https://devmeet.online" target="_blank" referrer="noopener noreferrer">
+  DevMeet
+</a>
 💻 **Backend API:** Deployed on AWS EC2 with Nginx + PM2  
 ⚡ **Frontend:** Served via Nginx reverse proxy  
 📂 **GitHub:** [Abhishek220801/DevTinder](https://github.com/Abhishek220801/DevTinder)
