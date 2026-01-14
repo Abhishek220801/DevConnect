@@ -1,8 +1,7 @@
-[![Live Demo](https://img.shields.io/badge/demo-live%20on%20AWS-success)](http://13.235.87.89/)
-[![Backend](https://img.shields.io/badge/backend-Node.js%20%2B%20Express-green)](http://13.235.87.89/)
-[![Frontend](https://img.shields.io/badge/frontend-React-blue)](http://13.235.87.89/)
-[![Deployment](https://img.shields.io/badge/deployed%20on-AWS%20EC2-orange)](http://13.235.87.89/)
-[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+[![Live Demo](https://img.shields.io/badge/demo-live%20on%20AWS-success)](https://www.meetdev.online/)
+[![Backend](https://img.shields.io/badge/backend-Node.js%20%2B%20Express-green)](https://www.meetdev.online/)
+[![Frontend](https://img.shields.io/badge/frontend-React-blue)](https://www.meetdev.online/)
+[![Deployment](https://img.shields.io/badge/deployed%20on-AWS%20EC2-orange)](https://www.meetdev.online/)
 
 # 🚀 DevTinder — Developer Networking Platform
 
@@ -59,7 +58,7 @@ DevTinder goes beyond simple CRUD apps — it focuses on **backend architecture,
 - Optimized performance with lazy loading
 
 ### ☁️ Production Deployment
-- **Hosting:** **AWS EC2** (Ubuntu) — `http://13.235.87.89/`
+- **Hosting:** **AWS EC2** (Ubuntu) — `https://www.devmeet.online/`
 - **Process Management:** **PM2** for zero-downtime restarts and auto-restart on crashes
 - **Reverse Proxy:** **Nginx** for routing, load balancing, and serving static files
 - **Database:** MongoDB Atlas (cloud-hosted cluster)
@@ -102,7 +101,7 @@ DevTinder goes beyond simple CRUD apps — it focuses on **backend architecture,
 
 **Want to try it out without signing up?**
 
-👉 **Visit:** [http://13.235.87.89/](http://13.235.87.89/)
+👉 **Visit:** [http://www.meedev.online/](https://www.meetdev.online/)
 
 Use these test credentials:
 ```
@@ -181,7 +180,7 @@ Backend API: http://localhost:7777
 
 ## 🚧 Currently Working On
 
-- ✅ **AWS EC2 Deployment** — Live at `http://13.235.87.89/`
+- ✅ **AWS EC2 Deployment** — Live at `https://www.meetdev.online/`
 - ✅ **Nginx Reverse Proxy** — Configured and running
 - ✅ **PM2 Process Management** — Auto-restart and monitoring enabled
 - 🔄 **Custom Domain Setup** — DNS mapping and SSL certificate
