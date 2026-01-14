@@ -58,7 +58,7 @@ DevTinder goes beyond simple CRUD apps — it focuses on **backend architecture,
 - Optimized performance with lazy loading
 
 ### ☁️ Production Deployment
-- **Hosting:** **AWS EC2** (Ubuntu) — `https://www.devmeet.online/`
+- **Hosting:** **AWS EC2** (Ubuntu) — `http://13.235.87.89/`
 - **Process Management:** **PM2** for zero-downtime restarts and auto-restart on crashes
 - **Reverse Proxy:** **Nginx** for routing, load balancing, and serving static files
 - **Database:** MongoDB Atlas (cloud-hosted cluster)
