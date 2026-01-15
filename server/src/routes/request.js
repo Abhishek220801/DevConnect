@@ -5,6 +5,7 @@ const requestRouter = express.Router()
 import { userAuth } from "../middlewares/auth.js"
 import User from "../models/user.js"
 import ConnectionRequest from "../models/connectionRequest.js"
+import sendEmail from '../utils/sendEmail.js'
 
 requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
   try {
@@ -26,7 +27,6 @@ requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
 
     // safe fetch
     const toUser = await User.findById(toUserId).select("+_id firstName") // minimal fetch
-    console.log("toUser (db result):", toUser) // will log null if not found
 
     if (!toUser) {
       return res.status(404).json({ message: "User not found" });
@@ -60,6 +60,9 @@ requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
     })
 
     const data = await connectionRequest.save()
+    const emailRes = await sendEmail.run();
+    console.log(emailRes);
+
     res.json({
       message: `${req.user.firstName} gave ${toUser.firstName} a ${status}.`,
       data,

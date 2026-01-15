@@ -8,6 +8,7 @@ import Feed from "./components/Feed"
 import Connections from "./components/Connections"
 import NotFoundPage from "./components/NotFoundPage"
 import Requests from "./components/Requests"
+import ProtectedRoute from "./components/ProtectedRoute"
 
 function App() {
   return (
@@ -15,11 +16,18 @@ function App() {
       <BrowserRouter basename="/">
         <Routes>
           <Route path="/" element={<Body />}>
-            <Route path="/" element={<Feed />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/connections" element={<Connections />} />
-            <Route path="/requests" element={<Requests />} />
+            <Route 
+              index 
+              element={
+              <ProtectedRoute>
+                <Feed/>
+              </ProtectedRoute>
+            } 
+            />
+            <Route path="profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            <Route path="connections" element={<ProtectedRoute><Connections /></ProtectedRoute>} />
+            <Route path="requests" element={<ProtectedRoute><Requests /></ProtectedRoute>} />
+            <Route path="login" element={<Login />} />
             <Route path="*" element={<NotFoundPage/>}/>
           </Route>
         </Routes>

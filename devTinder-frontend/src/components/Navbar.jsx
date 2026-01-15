@@ -6,7 +6,6 @@ import { BASE_URL } from "../utils/constants";
 
 const Navbar = () => {
   const user = useSelector((store) => store.user);
-  console.log(user) 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 

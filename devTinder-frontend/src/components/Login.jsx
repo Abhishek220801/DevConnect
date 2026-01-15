@@ -7,8 +7,8 @@ import { BASE_URL } from "../utils/constants"
 import { toast } from "react-toastify"
 
 const Login = () => {
-  const [emailId, setEmailId] = useState("")
-  const [password, setPassword] = useState("")
+  const [emailId, setEmailId] = useState("simran@gmail.com")
+  const [password, setPassword] = useState("Simran@123")
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
   const [isLoginForm, setIsLoginForm] = useState(true)
@@ -22,7 +22,7 @@ const Login = () => {
 
   useEffect(() => {
     if (user) navigate("/")
-  }, [])
+  }, [user, navigate])
 
   const handleSubmit = async () => {
     setError("")
@@ -47,7 +47,7 @@ const Login = () => {
       }
     } catch (err) {
       toast.error(
-        err.response?.data?.message || err.response.data || "Bad credentials, Please try again."
+        err.response?.data?.message || err.response?.data || "Bad credentials, Please try again."
       )
     } finally {
       setIsLoading(false)

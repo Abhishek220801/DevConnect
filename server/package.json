@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node app.js",
-    "dev": "node --watch app.js"
+    "dev": "nodemon app.js"
   },
   "keywords": [
     "nodejs",
@@ -15,6 +15,7 @@
   "author": "Abhishek",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-ses": "^3.969.0",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",

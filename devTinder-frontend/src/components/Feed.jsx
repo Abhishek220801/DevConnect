@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { BASE_URL } from "../utils/constants";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Code2 } from 'lucide-react';
 import FeedCard from "./FeedCard";
 import { addFeed } from "../utils/FeedSlice";
