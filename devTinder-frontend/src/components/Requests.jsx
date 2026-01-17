@@ -2,7 +2,7 @@ import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 import { useEffect, useState } from "react";
 import { toast } from 'react-toastify'
-import { useSelector } from "react-redux";
+import {MoonLoader} from 'react-spinners'
 
 const Requests = () => {
   const [message, setMessage] = useState("");
@@ -45,13 +45,9 @@ const reviewRequest = async (status, requestId) => {
     getRequests();
   }, []);
 
-  // 👇 Rendering logic lives here
-
   if (loading) {
   return (
-    <div className="flex justify-center items-center h-60 text-gray-400">
-      Loading requests…
-    </div>
+    <MoonLoader/>
   );
 }
 

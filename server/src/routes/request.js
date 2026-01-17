@@ -60,16 +60,25 @@ requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
     })
 
     const data = await connectionRequest.save()
-    const emailRes = await sendEmail.run();
-    console.log(emailRes);
+    await sendEmail({
+      to: toUser.emailId,
+      from: "no-reply@meetdev.online", // must be verified in SES
+      subject: "New connection request on DevMeet",
+      text: `${req.user.firstName} sent you a ${status} request on DevMeet.`,
+      html: `
+        <h2>Hello ${toUser.firstName},</h2>
+        <p>${req.user.firstName} sent you a <b>${status}</b> request.</p>
+        <p>Login to DevMeet to respond.</p>
+      `,
+    });
 
     res.json({
-      message: `${req.user.firstName} gave ${toUser.firstName} a ${status}.`,
+      message: `${req.user.firstName} sent ${status} request to ${toUser.firstName}`,
       data,
-    })
+    });
   } catch (err) {
-    console.error("Send endpoint error:", err)
-    return res.status(500).json({ message: "Server error", error: err.message })
+    console.error("Send request error:", err)
+    return res.status(500).json({ message: "Server error", error: err.message });
   }
 })
 

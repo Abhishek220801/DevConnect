@@ -13,7 +13,6 @@ import axios from "axios"
 import { useDispatch } from "react-redux"
 import { BASE_URL, STATIC_URL } from "../utils/constants"
 import { removeUserFromFeed } from "../utils/FeedSlice"
-import { useEffect } from "react"
 
 const FeedCard = ({ user }) => {
   const {
@@ -35,11 +34,6 @@ const FeedCard = ({ user }) => {
   const [isFlipping, setIsFlipping] = useState(false)
 
   const dispatch = useDispatch()
-
-  useEffect(() => {
-  console.log("FeedCard mounted")
-  return () => console.log("FeedCard unmounted")
-}, [])
 
   const getPhotoUrl = (photoUrl) => {
   if (!photoUrl) return "https://geographyandyou.com/images/user-profile.png"

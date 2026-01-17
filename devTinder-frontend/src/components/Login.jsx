@@ -18,11 +18,6 @@ const Login = () => {
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const user = useSelector((store) => store.user)
-
-  useEffect(() => {
-    if (user) navigate("/")
-  }, [user, navigate])
 
   const handleSubmit = async () => {
     setError("")
