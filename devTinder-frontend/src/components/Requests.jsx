@@ -34,6 +34,7 @@ const Requests = () => {
 const reviewRequest = async (status, requestId) => {
   try {
     const res = await axios.post(BASE_URL + '/request/review/'+status+'/'+requestId, {}, {withCredentials: true});
+    console.log(res);
     const newArray = requests.filter((r) => r._id!==requestId);
     setRequests(newArray);
   } catch (err) {
