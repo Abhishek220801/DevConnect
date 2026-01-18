@@ -10,6 +10,7 @@ export const useAuth = () => {
 
   useEffect(() => {
     if(loaded) return;
+    if(user) return;
     axios
       .get(BASE_URL + "/profile", { withCredentials: true })
       .then(res => dispatch(addUser(res.data)))

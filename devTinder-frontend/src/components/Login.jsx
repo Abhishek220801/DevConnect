@@ -59,7 +59,7 @@ const Login = () => {
   useEffect(() => {
     if(user) navigate('/');
     return;
-  }, [])
+  }, [navigate, user])
 
   return (
     <div className="flex justify-center my-10">
