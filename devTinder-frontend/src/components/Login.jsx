@@ -1,20 +1,23 @@
-import { useEffect, useState } from "react"
+import {  useState } from "react"
 import axios from "axios"
 import { useDispatch, useSelector } from "react-redux"
 import { addUser } from "../utils/userSlice"
 import { useNavigate } from "react-router"
 import { BASE_URL } from "../utils/constants"
 import { toast } from "react-toastify"
+import { useEffect } from "react"
 
 const Login = () => {
-  const [emailId, setEmailId] = useState("")
-  const [password, setPassword] = useState("")
+  const [emailId, setEmailId] = useState("simran@gmail.com")
+  const [password, setPassword] = useState("Simran@123")
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
   const [isLoginForm, setIsLoginForm] = useState(true)
 
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+
+  const {data: user} = useSelector(store => store.user);
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -52,6 +55,11 @@ const Login = () => {
   const handleKeyDown = (e) => {
     if (e.key === "Enter") handleSubmit()
   }
+
+  useEffect(() => {
+    if(user) navigate('/');
+    return;
+  }, [])
 
   return (
     <div className="flex justify-center my-10">

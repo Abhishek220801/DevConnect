@@ -13,7 +13,6 @@ const Feed = lazy(() => import("./components/Feed"))
 const Connections = lazy(() => import("./components/Connections"))
 const Requests = lazy(() => import("./components/Requests"))
 
-
 function App() {
   return (
     <Provider store={appStore}>
