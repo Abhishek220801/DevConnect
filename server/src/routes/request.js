@@ -29,7 +29,7 @@ requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
     const toUser = await User.findById(toUserId).select(
       "+_id emailId firstName",
     ) // minimal fetch
-    
+
     if (!toUser) {
       return res.status(404).json({ message: "User not found" })
     }
@@ -38,7 +38,6 @@ requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
       console.error("Email missing for user:", toUserId)
       return res.status(400).json({ message: "Recipient email not available" })
     }
-
 
     const allowedStatus = ["like", "pass"]
     if (!allowedStatus.includes(status)) {
@@ -70,15 +69,104 @@ requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
     const data = await connectionRequest.save()
     console.log(toUser)
     await sendEmail({
-      to: 'abhi.sankhwar22@gmail.com',
-      from: "no-reply@meetdev.online", 
-      subject: "New connection request on DevMeet",
-      text: `${req.user.firstName} sent you a ${status} request on DevMeet.`,
+      to: "abhi.sankhwar22@gmail.com",
+      from: "no-reply@meetdev.online",
+      subject: "New connection request on MeetDev",
+      text: `${req.user.firstName} sent you a ${status} request on MeetDev.`,
       html: `
-        <h2>Hello ${toUser.firstName},</h2>
-        <p>${req.user.firstName} sent you a <b>${status}</b> request.</p>
-        <p><a target="_blank" href="meetdev.online/login">Login</a> to DevMeet to respond.</p>
-      `,
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>New Connection Request</title>
+    </head>
+    <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5;">
+      <table role="presentation" style="width: 100%; border-collapse: collapse; background-color: #f5f5f5;">
+        <tr>
+          <td align="center" style="padding: 40px 20px;">
+            <table role="presentation" style="max-width: 600px; width: 100%; border-collapse: collapse; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);">
+              
+              <!-- Header -->
+              <tr>
+                <td style="padding: 40px 40px 30px; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px 12px 0 0;">
+                  <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 600; letter-spacing: -0.5px;">
+                    MeetDev
+                  </h1>
+                </td>
+              </tr>
+              
+              <!-- Content -->
+              <tr>
+                <td style="padding: 40px;">
+                  
+                  <!-- Greeting -->
+                  <h2 style="margin: 0 0 20px; color: #1a1a1a; font-size: 24px; font-weight: 600;">
+                    Hi ${toUser.firstName}! 👋
+                  </h2>
+                  
+                  <!-- Main Message -->
+                  <p style="margin: 0 0 24px; color: #4a5568; font-size: 16px; line-height: 1.6;">
+                    You have a new connection request from <strong style="color: #667eea;">${req.user.firstName}</strong>. They're interested in connecting with you on MeetDev!
+                  </p>
+                  
+                  <!-- Card Box -->
+                  <div style="background-color: #f7fafc; border-left: 4px solid #667eea; padding: 20px; margin: 24px 0; border-radius: 4px;">
+                    <p style="margin: 0; color: #2d3748; font-size: 14px; line-height: 1.5;">
+                      <strong>Request Type:</strong> <span style="color: #667eea; text-transform: capitalize;">${status}</span>
+                    </p>
+                  </div>
+                  
+                  <!-- CTA Button -->
+                  <table role="presentation" style="margin: 32px 0;">
+                    <tr>
+                      <td align="center">
+                        <a href="https://meetdev.online/requests" target="_blank" style="display: inline-block; padding: 14px 32px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);">
+                          View Request
+                        </a>
+                      </td>
+                    </tr>
+                  </table>
+                  
+                  <!-- Secondary Text -->
+                  <p style="margin: 24px 0 0; color: #718096; font-size: 14px; line-height: 1.5;">
+                    Building connections is the first step to building something amazing together. Don't keep them waiting!
+                  </p>
+                  
+                </td>
+              </tr>
+              
+              <!-- Footer -->
+              <tr>
+                <td style="padding: 30px 40px; background-color: #f7fafc; border-radius: 0 0 12px 12px; border-top: 1px solid #e2e8f0;">
+                  <p style="margin: 0 0 8px; color: #718096; font-size: 13px; line-height: 1.5; text-align: center;">
+                    This email was sent to you because someone sent you a connection request on MeetDev.
+                  </p>
+                  <p style="margin: 0; color: #a0aec0; font-size: 12px; text-align: center;">
+                    © ${new Date().getFullYear()} MeetDev. All rights reserved.
+                  </p>
+                </td>
+              </tr>
+              
+            </table>
+            
+            <!-- Email Footer Links -->
+            <table role="presentation" style="max-width: 600px; width: 100%; margin-top: 20px;">
+              <tr>
+                <td style="text-align: center; padding: 0 20px;">
+                  <p style="margin: 0; color: #a0aec0; font-size: 12px;">
+                    <a href="https://meetdev.online" style="color: #667eea; text-decoration: none; margin: 0 10px;">Visit MeetDev</a>
+                  </p>
+                </td>
+              </tr>
+            </table>
+            
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `,
     })
 
     res.json({
