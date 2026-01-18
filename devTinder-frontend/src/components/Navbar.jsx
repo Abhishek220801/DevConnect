@@ -19,7 +19,7 @@ const Navbar = () => {
     }
   };
 
-  if (!loaded) return null; // prevents flicker
+  if (!loaded) return null;
 
   return (
     <div className="navbar bg-slate-900 shadow-sm">
@@ -54,7 +54,7 @@ const Navbar = () => {
               <li><Link to="/requests">Requests</Link></li>
               <li><button onClick={handleLogout}>Logout</button></li>
             </ul>
-          </div>
+          </div>  
         </div>
       )}
     </div>

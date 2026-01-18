@@ -24,7 +24,7 @@ app.use(express.urlencoded({extended: false}));
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 app.use(cors({   
-  origin: 'http://localhost:5173', 
+  origin: ['http://localhost:5173', 'https://geographyandyou.com/images'], 
   credentials: true,
 }));
 

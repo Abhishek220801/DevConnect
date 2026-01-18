@@ -5,13 +5,13 @@ const requestRouter = express.Router()
 import { userAuth } from "../middlewares/auth.js"
 import User from "../models/user.js"
 import ConnectionRequest from "../models/connectionRequest.js"
-import sendEmail from '../utils/sendEmail.js'
+import sendEmail from "../utils/sendEmail.js"
 
 requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
   try {
-    const fromUserId = req.user._id;
-    const toUserId = req.params.toUserId;
-    const status = req.params.status;
+    const fromUserId = req.user._id
+    const toUserId = req.params.toUserId
+    const status = req.params.status
 
     // validate ObjectId first
     if (!mongoose.isValidObjectId(toUserId)) {
@@ -26,13 +26,21 @@ requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
     }
 
     // safe fetch
-    const toUser = await User.findById(toUserId).select("+_id firstName") // minimal fetch
-
+    const toUser = await User.findById(toUserId).select(
+      "+_id emailId firstName",
+    ) // minimal fetch
+    
     if (!toUser) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: "User not found" })
     }
 
-    const allowedStatus = ["like", "pass"];
+    if (!toUser.emailId) {
+      console.error("Email missing for user:", toUserId)
+      return res.status(400).json({ message: "Recipient email not available" })
+    }
+
+
+    const allowedStatus = ["like", "pass"]
     if (!allowedStatus.includes(status)) {
       return res.status(400).json({
         message: "Invalid status type: " + status,
@@ -60,25 +68,26 @@ requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
     })
 
     const data = await connectionRequest.save()
+    console.log(toUser)
     await sendEmail({
-      to: toUser.emailId,
-      from: "no-reply@meetdev.online", // must be verified in SES
+      to: 'abhi.sankhwar22@gmail.com',
+      from: "no-reply@meetdev.online", 
       subject: "New connection request on DevMeet",
       text: `${req.user.firstName} sent you a ${status} request on DevMeet.`,
       html: `
         <h2>Hello ${toUser.firstName},</h2>
         <p>${req.user.firstName} sent you a <b>${status}</b> request.</p>
-        <p>Login to DevMeet to respond.</p>
+        <p><a target="_blank" href="meetdev.online/login">Login</a> to DevMeet to respond.</p>
       `,
-    });
+    })
 
     res.json({
       message: `${req.user.firstName} sent ${status} request to ${toUser.firstName}`,
       data,
-    });
+    })
   } catch (err) {
     console.error("Send request error:", err)
-    return res.status(500).json({ message: "Server error", error: err.message });
+    return res.status(500).json({ message: "Server error", error: err.message })
   }
 })
 
@@ -98,8 +107,8 @@ requestRouter.post("/review/:status/:requestId", userAuth, async (req, res) => {
     if (!connectionRequest) {
       return res.status(400).json({ message: "Connection request not found" })
     }
-    connectionRequest.status = "accepted";
-    const data = await connectionRequest.save();
+    connectionRequest.status = "accepted"
+    const data = await connectionRequest.save()
     res.json({ message: `Connection request ${status}ed`, data })
   } catch (err) {
     res.status(400).send("ERROR : " + err.message)
