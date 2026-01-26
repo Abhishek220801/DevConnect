@@ -15,7 +15,7 @@ const Login = () => {
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
-  const { data: user } = useSelector(store => store.user)
+  const { data: user } = useSelector((store) => store.user)
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
@@ -27,7 +27,7 @@ const Login = () => {
         const res = await axios.post(
           BASE_URL + "/login",
           { emailId, password },
-          { withCredentials: true }
+          { withCredentials: true },
         )
         dispatch(addUser(res.data))
         navigate("/")
@@ -35,14 +35,16 @@ const Login = () => {
         await axios.post(
           BASE_URL + "/signup",
           { firstName, lastName, emailId, password },
-          { withCredentials: true }
+          { withCredentials: true },
         )
         toast.success("Account created. Please login.")
         setIsLoginForm(true)
       }
     } catch (err) {
       toast.error(
-        err.response?.data?.message || err.response?.data || "Bad credentials, Please try again."
+        err.response?.data?.message ||
+          err.response?.data ||
+          "Bad credentials, Please try again.",
       )
     } finally {
       setIsLoading(false)
@@ -54,7 +56,7 @@ const Login = () => {
   }
 
   useEffect(() => {
-    if (user) navigate('/')
+    if (user) navigate("/")
   }, [navigate, user])
 
   return (
@@ -72,15 +74,27 @@ const Login = () => {
             <div className="absolute inset-0 bg-black/5"></div>
             <div className="relative">
               <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl mx-auto mb-2 flex items-center justify-center">
-                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                <svg
+                  className="w-7 h-7 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                  />
                 </svg>
               </div>
               <h1 className="text-2xl font-bold text-white mb-1">
                 {isLoginForm ? "Welcome Back!" : "Join MeetDev"}
               </h1>
               <p className="text-purple-100 text-sm">
-                {isLoginForm ? "Connect with developers" : "Start networking today"}
+                {isLoginForm
+                  ? "Connect with developers"
+                  : "Start networking today"}
               </p>
             </div>
           </div>
@@ -127,6 +141,7 @@ const Login = () => {
                 </label>
                 <input
                   type="email"
+                  // className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200 disabled:opacity-50 text-gray-900 placeholder-gray-400"
                   className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200 disabled:opacity-50 text-gray-900 placeholder-gray-400"
                   placeholder="you@example.com"
                   value={emailId}
@@ -142,6 +157,7 @@ const Login = () => {
                 </label>
                 <input
                   type="password"
+                  // className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200 disabled:opacity-50 text-gray-900 placeholder-gray-400"
                   className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200 disabled:opacity-50 text-gray-900 placeholder-gray-400"
                   placeholder="••••••••"
                   value={password}
@@ -165,11 +181,29 @@ const Login = () => {
               >
                 {isLoading ? (
                   <>
-                    <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <svg
+                      className="animate-spin h-4 w-4 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
                     </svg>
-                    <span>{isLoginForm ? "Logging in..." : "Creating account..."}</span>
+                    <span>
+                      {isLoginForm ? "Logging in..." : "Creating account..."}
+                    </span>
                   </>
                 ) : (
                   <span>{isLoginForm ? "Log In" : "Sign Up"}</span>
@@ -180,7 +214,9 @@ const Login = () => {
             {/* Toggle form */}
             <div className="mt-4 text-center">
               <p className="text-gray-600 text-sm">
-                {isLoginForm ? "Don't have an account? " : "Already have an account? "}
+                {isLoginForm
+                  ? "Don't have an account? "
+                  : "Already have an account? "}
                 <button
                   type="button"
                   onClick={() => setIsLoginForm(!isLoginForm)}
