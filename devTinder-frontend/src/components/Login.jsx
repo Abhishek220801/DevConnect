@@ -7,8 +7,13 @@ import { BASE_URL } from "../utils/constants"
 import { toast } from "react-toastify"
 
 const Login = () => {
+<<<<<<< HEAD
   const [emailId, setEmailId] = useState("")
   const [password, setPassword] = useState("")
+=======
+  const [emailId, setEmailId] = useState("test@gmail.com")
+  const [password, setPassword] = useState("Test@123")
+>>>>>>> 5eb63fe (login default creds remove)
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
   const [isLoginForm, setIsLoginForm] = useState(true)
