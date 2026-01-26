@@ -1,15 +1,15 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import FeedCard from "./FeedCard.jsx"
 import { BASE_URL } from "../utils/constants.js"
 import { useDispatch } from "react-redux"
 import { addUser } from "../utils/userSlice.js"
 import axios from "axios"
-import { useRef } from "react"
+import { User, Mail, MapPin, Briefcase, Github, Linkedin, Twitter, Upload, Save } from "lucide-react"
 
 const EditProfile = ({ user }) => {
   const dispatch = useDispatch()
   const [previewPhotoUrl, setPreviewPhotoUrl] = useState("")
-  const hasInitialized = useRef(false);
+  const hasInitialized = useRef(false)
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -31,8 +31,7 @@ const EditProfile = ({ user }) => {
 
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
-
-  const [originalData, setOriginalData] = useState({})
+  const [isSaving, setIsSaving] = useState(false)
 
   useEffect(() => {
     if (!user || hasInitialized.current) return
@@ -56,7 +55,6 @@ const EditProfile = ({ user }) => {
     }
 
     setFormData((prev) => ({ ...prev, ...userData }))
-    setOriginalData(userData)
     hasInitialized.current = true
   }, [user])
 
@@ -71,13 +69,11 @@ const EditProfile = ({ user }) => {
     const file = e.target.files?.[0]
     if (!file) return
 
-    // Validate file type
     if (!file.type.startsWith("image/")) {
       setError("Please select a valid image file")
       return
     }
 
-    // Validate file size (5MB)
     if (file.size > 5 * 1024 * 1024) {
       setError("Image size must be less than 5MB")
       return
@@ -88,7 +84,6 @@ const EditProfile = ({ user }) => {
       photo: file,
     }))
 
-    // Create preview URL
     if (previewPhotoUrl) URL.revokeObjectURL(previewPhotoUrl)
     const blobUrl = URL.createObjectURL(file)
     setPreviewPhotoUrl(blobUrl)
@@ -105,8 +100,8 @@ const EditProfile = ({ user }) => {
   }
 
   const saveProfile = async () => {
-    console.log("========== SAVE PROFILE START ==========")
     try {
+      setIsSaving(true)
       setError("")
       setSuccess("")
 
@@ -134,27 +129,20 @@ const EditProfile = ({ user }) => {
       data.append("skills", JSON.stringify(formData.skills || []))
 
       if (formData.photo) {
-        console.log("Uploading photo:", formData.photo.name)
         data.append("photo", formData.photo)
       }
 
-      // Send request
       const res = await axios.patch(BASE_URL + "/profile/edit", data, {
         withCredentials: true,
       })
 
-      console.log("Server response:", res.data)
-
-      // Update Redux
       dispatch(addUser(res.data.data))
 
-      // Update local state with server response
       const updatedData = {
         ...res.data.data,
         photo: null,
       }
 
-      // Clean up preview blob URL
       if (previewPhotoUrl) URL.revokeObjectURL(previewPhotoUrl)
       setPreviewPhotoUrl("")
       const newPhotoUrl = res.data.data.photoUrl
@@ -166,14 +154,14 @@ const EditProfile = ({ user }) => {
         photo: null,
       }))
 
-      setOriginalData(updatedData) // Update original to prevent "no changes" on next save
-      setSuccess("Profile updated successfully")
-      console.log("========== SAVE PROFILE END ==========")
+      setSuccess("Profile updated successfully! ✓")
     } catch (err) {
       console.error("Save profile error:", err)
       setError(
         err?.response?.data?.message || "Something went wrong. Try again."
       )
+    } finally {
+      setIsSaving(false)
     }
   }
 
@@ -188,132 +176,341 @@ const EditProfile = ({ user }) => {
   const displayPhotoUrl = previewPhotoUrl || formData.photoUrl
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-10">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-        {/* EDIT FORM */}
-        <form
-          onSubmit={handleSubmit}
-          className="bg-base-200 rounded-xl shadow-lg p-6 
-                     max-h-[75vh] overflow-y-auto"
-        >
-          <h2 className="text-2xl font-semibold mb-6 tracking-tight">
-            Edit Profile
-          </h2>
-
-          {error && <p className="text-red-500 mb-3">{error}</p>}
-          {success && <p className="text-green-500 mb-3">{success}</p>}
-
-          {[
-            ["First Name", "firstName", "text"],
-            ["Last Name", "lastName", "text"],
-            ["Email", "emailId", "email"],
-            ["Age", "age", "number"],
-            ["Location", "location", "text"],
-            ["Current Role", "currentRole", "text"],
-            ["Company", "company", "text"],
-            ["GitHub", "github", "text"],
-            ["LinkedIn", "linkedin", "text"],
-            ["Twitter", "twitter", "text"],
-          ].map(([label, name, type]) => (
-            <div key={name} className="mb-4">
-              <label className="text-sm text-gray-400 block mb-1">
-                {label}
-              </label>
-              <input
-                type={type}
-                name={name}
-                value={formData[name]}
-                onChange={handleChange}
-                className="input input-bordered w-full h-11"
-              />
-            </div>
-          ))}
-          <div className="mb-4">
-            <label className="text-sm text-gray-400 block mb-1">
-              Profile Photo
-            </label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              className="file-input file-input-bordered w-full"
-            />
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 py-12 px-4">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center gap-2 bg-purple-100 text-purple-700 px-4 py-2 rounded-full mb-3">
+            <User size={16} />
+            <span className="text-xs font-medium">Profile Settings</span>
           </div>
-          <div className="mb-4">
-            <label className="text-sm text-gray-400 block mb-1">Gender</label>
-            <select
-              name="gender"
-              value={formData.gender}
-              onChange={handleChange}
-              className="select select-bordered w-full"
-            >
-              <option value="" disabled selected>
-                Select gender
-              </option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="preferNotToSay">Prefer not to say</option>
-            </select>
-          </div>
+          <h1 className="text-4xl font-semibold text-gray-900 mb-3">
+            Edit Your Profile
+          </h1>
+          <p className="text-gray-600">
+            Update your information and see how it looks in real-time
+          </p>
+        </div>
 
-          <div className="mb-4">
-            <label className="text-sm text-gray-400 block mb-1">About</label>
-            <textarea
-              name="about"
-              value={formData.about}
-              onChange={handleChange}
-              className="textarea textarea-bordered w-full min-h-25"
-            />
-          </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
+          {/* EDIT FORM */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="bg-white/80 backdrop-blur-xl rounded-xl shadow-xl border border-gray-200 p-5 max-h-[75vh] overflow-y-auto">
+              <h2 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <User size={24} className="text-purple-600" />
+                Personal Information
+              </h2>
 
-          <div className="mb-6">
-            <label className="text-sm text-gray-400 block mb-1">
-              Skills (comma separated)
-            </label>
-            <input
-              type="text"
-              value={formData.skills.join(", ")}
-              onChange={(e) => {
-                const skillsArray = e.target.value
-                  .split(",")
-                  .map((s) => s.trim())
-                  .filter(Boolean)
-                setFormData((prev) => ({
-                  ...prev,
-                  skills: skillsArray,
-                }))
-              }}
-              className="input input-bordered w-full h-11"
-              placeholder="React, Node.js, Python..."
-            />
-            {formData.skills.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-2">
-                {formData.skills.map((skill, idx) => (
-                  <span
-                    key={idx}
-                    className="px-2 py-1 bg-purple-500/20 text-purple-300 rounded text-xs"
-                  >
-                    {skill}
-                  </span>
-                ))}
+              {/* Error/Success Messages */}
+              {error && (
+                <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-lg text-xs">
+                  {error}
+                </div>
+              )}
+              {success && (
+                <div className="mb-4 bg-green-50 border border-green-200 text-green-700 px-3 py-2 rounded-lg text-xs">
+                  {success}
+                </div>
+              )}
+
+              {/* Profile Photo */}
+              <div className="mb-4">
+                <label className="block text-xs font-medium text-gray-700 mb-3">
+                  Profile Photo
+                </label>
+                <div className="flex items-center gap-4">
+                  {displayPhotoUrl && (
+                    <div className="w-14 h-14 rounded-xl overflow-hidden ring-2 ring-purple-500 ring-offset-2">
+                      <img
+                        src={displayPhotoUrl}
+                        alt="Preview"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  <label className="flex-1 flex items-center justify-center gap-2 px-4 py-2 text-sm bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors">
+                    <Upload size={18} className="text-gray-600" />
+                    <span className="text-xs text-gray-600 font-medium">
+                      {formData.photo ? formData.photo.name : "Choose Image"}
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  Max size: 5MB. Formats: JPG, PNG, GIF
+                </p>
               </div>
-            )}
+
+              {/* Name Fields */}
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    First Name *
+                  </label>
+                  <input
+                    type="text"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200 text-gray-900"
+                    placeholder="John"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    Last Name
+                  </label>
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200 text-gray-900"
+                    placeholder="Doe"
+                  />
+                </div>
+              </div>
+
+              {/* Email & Age */}
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    <Mail size={14} className="inline mr-1" />
+                    Email *
+                  </label>
+                  <input
+                    type="email"
+                    name="emailId"
+                    value={formData.emailId}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200 text-gray-900"
+                    placeholder="john@example.com"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    Age
+                  </label>
+                  <input
+                    type="number"
+                    name="age"
+                    value={formData.age}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200 text-gray-900"
+                    placeholder="25"
+                  />
+                </div>
+              </div>
+
+              {/* Gender */}
+              <div className="mb-4">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  Gender
+                </label>
+                <select
+                  name="gender"
+                  value={formData.gender}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200 text-gray-900"
+                >
+                  <option value="">Select gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="preferNotToSay">Prefer not to say</option>
+                </select>
+              </div>
+
+              {/* Location & Current Role */}
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    <MapPin size={14} className="inline mr-1" />
+                    Location
+                  </label>
+                  <input
+                    type="text"
+                    name="location"
+                    value={formData.location}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200 text-gray-900"
+                    placeholder="San Francisco, CA"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    <Briefcase size={14} className="inline mr-1" />
+                    Current Role
+                  </label>
+                  <input
+                    type="text"
+                    name="currentRole"
+                    value={formData.currentRole}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200 text-gray-900"
+                    placeholder="Software Engineer"
+                  />
+                </div>
+              </div>
+
+              {/* Company */}
+              <div className="mb-4">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  Company
+                </label>
+                <input
+                  type="text"
+                  name="company"
+                  value={formData.company}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200 text-gray-900"
+                  placeholder="Tech Corp"
+                />
+              </div>
+
+              {/* About */}
+              <div className="mb-4">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  About
+                </label>
+                <textarea
+                  name="about"
+                  value={formData.about}
+                  onChange={handleChange}
+                  rows="3"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200 text-gray-900 resize-none"
+                  placeholder="Tell us about yourself..."
+                />
+              </div>
+
+              {/* Skills */}
+              <div className="mb-4">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  Skills (comma separated)
+                </label>
+                <input
+                  type="text"
+                  value={formData.skills.join(", ")}
+                  onChange={(e) => {
+                    const skillsArray = e.target.value
+                      .split(",")
+                      .map((s) => s.trim())
+                      .filter(Boolean)
+                    setFormData((prev) => ({
+                      ...prev,
+                      skills: skillsArray,
+                    }))
+                  }}
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200 text-gray-900"
+                  placeholder="React, Node.js, Python, MongoDB..."
+                />
+                {formData.skills.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {formData.skills.map((skill, idx) => (
+                      <span
+                        key={idx}
+                        className="px-2 py-1 text-xs bg-purple-50 border border-purple-200 rounded-full text-xs font-medium text-purple-700"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Social Links */}
+              <div className="space-y-4 mb-4">
+                <h3 className="text-sm font-semibold text-gray-900">Social Links</h3>
+                
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    <Github size={14} className="inline mr-1" />
+                    GitHub
+                  </label>
+                  <input
+                    type="text"
+                    name="github"
+                    value={formData.github}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200 text-gray-900"
+                    placeholder="https://github.com/username"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    <Linkedin size={14} className="inline mr-1" />
+                    LinkedIn
+                  </label>
+                  <input
+                    type="text"
+                    name="linkedin"
+                    value={formData.linkedin}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200 text-gray-900"
+                    placeholder="https://linkedin.com/in/username"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    <Twitter size={14} className="inline mr-1" />
+                    Twitter
+                  </label>
+                  <input
+                    type="text"
+                    name="twitter"
+                    value={formData.twitter}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200 text-gray-900"
+                    placeholder="https://twitter.com/username"
+                  />
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={isSaving}
+                className="w-full bg-gradient-to-r from-purple-600 to-blue-500 text-white font-medium py-4 px-6 rounded-xl hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
+              >
+                {isSaving ? (
+                  <>
+                    <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Saving Changes...</span>
+                  </>
+                ) : (
+                  <>
+                    <Save size={20} />
+                    <span>Save Changes</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+
+          {/* PREVIEW */}
+          <div className="sticky top-24">
+            <div className="mb-4 text-center">
+              <span className="inline-block bg-purple-100 text-purple-700 px-4 py-2 rounded-full text-xs font-medium">
+                Live Preview
+              </span>
+            </div>
+            <FeedCard
+              user={{
+                ...formData,
+                photoUrl: displayPhotoUrl,
+              }}
+              variant="preview"
+            />
           </div>
-
-          <button type="submit" className="btn btn-primary w-full">
-            Save Changes
-          </button>
-        </form>
-
-        {/* PREVIEW (READ-ONLY) */}
-        <div className="sticky top-24">
-          <FeedCard
-            user={{
-              ...formData,
-              photoUrl: displayPhotoUrl,
-            }}
-            variant="preview"
-          />
         </div>
       </div>
     </div>

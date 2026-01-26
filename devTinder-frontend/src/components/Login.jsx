@@ -1,11 +1,10 @@
-import {  useState } from "react"
+import { useState, useEffect } from "react"
 import axios from "axios"
 import { useDispatch, useSelector } from "react-redux"
 import { addUser } from "../utils/userSlice"
 import { useNavigate } from "react-router"
 import { BASE_URL } from "../utils/constants"
 import { toast } from "react-toastify"
-import { useEffect } from "react"
 
 const Login = () => {
   const [emailId, setEmailId] = useState("")
@@ -13,12 +12,10 @@ const Login = () => {
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
   const [isLoginForm, setIsLoginForm] = useState(true)
-
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
-  const {data: user} = useSelector(store => store.user);
-
+  const { data: user } = useSelector(store => store.user)
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
@@ -26,10 +23,10 @@ const Login = () => {
     setError("")
     setIsLoading(true)
     try {
-      if(isLoginForm){
+      if (isLoginForm) {
         const res = await axios.post(
           BASE_URL + "/login",
-          {emailId, password},
+          { emailId, password },
           { withCredentials: true }
         )
         dispatch(addUser(res.data))
@@ -40,8 +37,8 @@ const Login = () => {
           { firstName, lastName, emailId, password },
           { withCredentials: true }
         )
-        toast.success("Account created. Please login.");
-        setIsLoginForm(true);
+        toast.success("Account created. Please login.")
+        setIsLoginForm(true)
       }
     } catch (err) {
       toast.error(
@@ -57,90 +54,164 @@ const Login = () => {
   }
 
   useEffect(() => {
-    if(user) navigate('/');
-    return;
+    if (user) navigate('/')
   }, [navigate, user])
 
   return (
-    <div className="flex justify-center my-10">
-      <fieldset className="fieldset bg-base-300 border-base-300 rounded-box w-xs border p-4 ">
-        <legend className="fieldset-legend">
-          {isLoginForm ? "Login" : "Sign Up"}
-        </legend>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-white to-blue-50 px-4 py-8">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-40">
+        <div className="absolute -top-20 -right-20 w-40 h-40 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl animate-blob"></div>
+        <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-2000"></div>
+      </div>
 
-        {!isLoginForm && (
-          <>
-            <label className="label">First Name</label>
-            <input
-              className="input"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value) + setError("")}
-              onKeyDown={handleKeyDown}
-              disabled={isLoading}
-            />
-
-            <label className="label">Last Name</label>
-            <input
-              className="input"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value) + setError("")}
-              onKeyDown={handleKeyDown}
-              disabled={isLoading}
-            />
-          </>
-        )}
-
-        <label className="label">Email</label>
-        <input
-          type="email"
-          className="input"
-          value={emailId}
-          onChange={(e) => setEmailId(e.target.value) + setError("")}
-          onKeyDown={handleKeyDown}
-          disabled={isLoading}
-        />
-
-        <label className="label">Password</label>
-        <input
-          type="password"
-          className="input"
-          value={password}
-          onChange={(e) => setPassword(e.target.value) + setError("")}
-          onKeyDown={handleKeyDown}
-          disabled={isLoading}
-        />
-
-        {error && (
-          <div className="text-error mt-2 mb-1">
-            <span>{error}</span>
+      {/* Main card - more compact */}
+      <div className="relative w-full max-w-md">
+        <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
+          {/* Header - more compact */}
+          <div className="relative bg-gradient-to-r from-purple-600 via-purple-500 to-blue-500 px-6 py-6 text-center">
+            <div className="absolute inset-0 bg-black/5"></div>
+            <div className="relative">
+              <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl mx-auto mb-2 flex items-center justify-center">
+                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <h1 className="text-2xl font-bold text-white mb-1">
+                {isLoginForm ? "Welcome Back!" : "Join MeetDev"}
+              </h1>
+              <p className="text-purple-100 text-sm">
+                {isLoginForm ? "Connect with developers" : "Start networking today"}
+              </p>
+            </div>
           </div>
-        )}
 
-        <button
-          className="btn btn-neutral mt-4 w-full"
-          onClick={handleSubmit}
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <>
-              <span className="loading loading-spinner loading-sm"></span>
-              {isLoginForm ? "Logging in..." : "Signing up..."}
-            </>
-          ) : (
-            isLoginForm ? "Login" : "Sign Up"
-          )}
-        </button>
+          {/* Form - more compact */}
+          <div className="px-6 py-6">
+            <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
+              {!isLoginForm && (
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                      First Name
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200 disabled:opacity-50 text-gray-900 placeholder-gray-400"
+                      placeholder="John"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      disabled={isLoading}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                      Last Name
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200 disabled:opacity-50 text-gray-900 placeholder-gray-400"
+                      placeholder="Doe"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      disabled={isLoading}
+                    />
+                  </div>
+                </div>
+              )}
 
-        <p className="m-auto text-gray-400">
-          {isLoginForm ? "New here? " : "Already registered? "}
-          <span
-            className="hover:underline cursor-pointer"
-            onClick={() => setIsLoginForm(!isLoginForm)}
-          >
-            {isLoginForm ? "Register" : "Login"}
-          </span>
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200 disabled:opacity-50 text-gray-900 placeholder-gray-400"
+                  placeholder="you@example.com"
+                  value={emailId}
+                  onChange={(e) => setEmailId(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  disabled={isLoading}
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200 disabled:opacity-50 text-gray-900 placeholder-gray-400"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  disabled={isLoading}
+                />
+              </div>
+
+              {error && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-lg text-xs">
+                  {error}
+                </div>
+              )}
+
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={isLoading}
+                className="w-full bg-gradient-to-r from-purple-600 to-blue-500 text-white font-semibold py-2.5 px-4 rounded-lg hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none flex items-center justify-center gap-2 text-sm"
+              >
+                {isLoading ? (
+                  <>
+                    <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>{isLoginForm ? "Logging in..." : "Creating account..."}</span>
+                  </>
+                ) : (
+                  <span>{isLoginForm ? "Log In" : "Sign Up"}</span>
+                )}
+              </button>
+            </form>
+
+            {/* Toggle form */}
+            <div className="mt-4 text-center">
+              <p className="text-gray-600 text-sm">
+                {isLoginForm ? "Don't have an account? " : "Already have an account? "}
+                <button
+                  type="button"
+                  onClick={() => setIsLoginForm(!isLoginForm)}
+                  className="text-purple-600 font-semibold hover:text-purple-700 hover:underline transition duration-200"
+                >
+                  {isLoginForm ? "Sign up" : "Log in"}
+                </button>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer text */}
+        <p className="text-center text-gray-500 text-xs mt-4 px-4">
+          By continuing, you agree to MeetDev's Terms & Privacy Policy
         </p>
-      </fieldset>
+      </div>
+
+      <style>{`
+        @keyframes blob {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          33% { transform: translate(30px, -50px) scale(1.1); }
+          66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+        .animate-blob {
+          animation: blob 7s infinite;
+        }
+        .animation-delay-2000 {
+          animation-delay: 2s;
+        }
+      `}</style>
     </div>
   )
 }

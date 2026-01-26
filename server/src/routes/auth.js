@@ -11,7 +11,6 @@ authRouter.post('/signup', async (req, res) => {
 
         // encrypt the password 
         const {firstName, lastName, emailId, password} = req.body;
-        if(!validator.isEmail(emailId)) throw new Error('Please enter a valid email address');
         const foundUser = await User.findOne({emailId});
         if(foundUser) return res.status(400).send("That email address is already taken.");
 

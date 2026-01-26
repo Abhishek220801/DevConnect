@@ -2,12 +2,11 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { BASE_URL } from "../utils/constants";
 import { useEffect } from "react";
-import { Code2 } from 'lucide-react';
+import { Code2, Sparkles } from 'lucide-react';
 import FeedCard from "./FeedCard";
 import { addFeed } from "../utils/FeedSlice";
 
 const Feed = () => {
-  
   const feed = useSelector(store => store.feed);
   const dispatch = useDispatch();
 
@@ -22,19 +21,26 @@ const Feed = () => {
 
   useEffect(() => {
     getFeed();
-  }, [dispatch])
+  }, [])
 
   const hasUsers = feed && feed.length > 0;
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 flex items-center justify-center p-4 py-12">
       <div className="w-full max-w-md">
         {hasUsers ? (
-          <div className="space-y-4">
-            <div className="text-center mb-6">
-              <h1 className="text-2xl font-bold text-white mb-2">Discover Developers</h1>
-              <p className="text-slate-400 text-sm">
-                {feed.length} remaining
+          <div className="space-y-6">
+            {/* Header */}
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center gap-2 bg-purple-100 text-purple-700 px-4 py-2 rounded-full mb-3">
+                <Sparkles size={16} />
+                <span className="text-sm font-semibold">Discover Developers</span>
+              </div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                Find Your Next Connection
+              </h1>
+              <p className="text-gray-600 text-sm">
+                {feed.length} {feed.length === 1 ? 'developer' : 'developers'} waiting to connect
               </p>
             </div>
             
@@ -44,12 +50,18 @@ const Feed = () => {
             />
           </div>
         ) : (
-          <div className="text-center p-12 bg-slate-900/50 rounded-3xl border border-purple-500/20">
-            <div className="w-20 h-20 bg-purple-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Code2 size={40} className="text-purple-400" />
+          <div className="text-center p-12 bg-white/80 backdrop-blur-xl rounded-3xl border border-gray-200 shadow-xl">
+            <div className="w-24 h-24 bg-gradient-to-br from-purple-100 to-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Code2 size={48} className="text-purple-600" />
             </div>
-            <h2 className="text-2xl font-bold text-white mb-2">All Caught Up!</h2>
-            <p className="text-slate-400 mb-6">Check back later for more developers</p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">All Caught Up!</h2>
+            <p className="text-gray-600 mb-6 max-w-sm mx-auto">
+              You've seen all available developers. Check back later for more connections!
+            </p>
+            <div className="inline-flex items-center gap-2 text-purple-600 font-medium">
+              <Sparkles size={16} />
+              <span className="text-sm">New developers added daily</span>
+            </div>
           </div>
         )}
       </div>

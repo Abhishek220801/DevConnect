@@ -1,11 +1,13 @@
 import validator from "validator"
 
 export const validateSignUpData = (req) => {
-  const { firstName, password } = req.body
+  const { firstName, password, emailId } = req.body
   if (!firstName) throw new Error("Please enter a first name")
   if (!password) throw new Error("Please enter a password")
-  else if (firstName.length < 3 && firstName.length > 64)
-    throw new Error("First name must be between 4-64 characters long")
+  else if (firstName.length < 3 || firstName.length > 64)
+    throw new Error("First name must be between 4 and 64 characters.")
+  else if(!validator.isEmail(emailId)) 
+    throw new Error('Please enter a valid email address');
   else if (!validator.isStrongPassword(password)) {
     throw new Error("Please enter a strong password")
   }
