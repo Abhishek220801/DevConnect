@@ -4,7 +4,7 @@
 [![Deployment](https://img.shields.io/badge/deployed%20on-AWS%20EC2-orange)](https://www.meetdev.online/)
 [![SSL](https://img.shields.io/badge/SSL-secured-brightgreen)](https://www.meetdev.online/)
 
-# 🚀 DevTinder — Production-Ready Developer Networking Platform
+# 🚀 MeetDev — Production-Ready Developer Networking Platform
 
 **A full-stack developer networking platform built to understand real-world system design, scalability, AWS infrastructure, and production-grade features.**
 
