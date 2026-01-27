@@ -7,13 +7,8 @@ import { BASE_URL } from "../utils/constants"
 import { toast } from "react-toastify"
 
 const Login = () => {
-<<<<<<< HEAD
   const [emailId, setEmailId] = useState("")
   const [password, setPassword] = useState("")
-=======
-  const [emailId, setEmailId] = useState("test@gmail.com")
-  const [password, setPassword] = useState("Test@123")
->>>>>>> 5eb63fe (login default creds remove)
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
   const [isLoginForm, setIsLoginForm] = useState(true)
@@ -65,16 +60,14 @@ const Login = () => {
   }, [navigate, user])
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-white to-blue-50 px-4 py-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-white to-blue-50 px-4 py-6">
       <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-40">
         <div className="absolute -top-20 -right-20 w-40 h-40 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl animate-blob"></div>
         <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-2000"></div>
       </div>
 
-      {/* Main card - more compact */}
       <div className="relative w-full max-w-md">
         <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
-          {/* Header - more compact */}
           <div className="relative bg-gradient-to-r from-purple-600 via-purple-500 to-blue-500 px-6 py-6 text-center">
             <div className="absolute inset-0 bg-black/5"></div>
             <div className="relative">
@@ -146,7 +139,6 @@ const Login = () => {
                 </label>
                 <input
                   type="email"
-                  // className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200 disabled:opacity-50 text-gray-900 placeholder-gray-400"
                   className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200 disabled:opacity-50 text-gray-900 placeholder-gray-400"
                   placeholder="you@example.com"
                   value={emailId}
@@ -162,7 +154,6 @@ const Login = () => {
                 </label>
                 <input
                   type="password"
-                  // className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200 disabled:opacity-50 text-gray-900 placeholder-gray-400"
                   className="w-full px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200 disabled:opacity-50 text-gray-900 placeholder-gray-400"
                   placeholder="••••••••"
                   value={password}

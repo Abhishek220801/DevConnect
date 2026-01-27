@@ -10,9 +10,10 @@ const Body = () => {
     <div className="min-h-screen flex flex-col bg-base-100">
       <Navbar />
 
-      {/* main content grows, footer sticks */}
       <main className="flex-1 bg-black">
-        <Outlet />
+        <image href="">
+          <Outlet/>
+        </image>
       </main>
 
       <Footer />

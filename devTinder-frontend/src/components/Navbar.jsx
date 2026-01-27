@@ -60,7 +60,6 @@ const Navbar = () => {
 
           {user && (
             <div className="flex items-center gap-3">
-              {/* Welcome - hidden on mobile */}
               <div className="hidden md:flex items-center gap-1.5 text-gray-600 text-sm">
                 <span>Hi,</span>
                 <span className="font-semibold text-gray-900">{user.firstName}</span>
