@@ -21,7 +21,7 @@ const Feed = () => {
 
   useEffect(() => {
     getFeed();
-  }, [])
+  }, [dispatch])
 
   const hasUsers = feed && feed.length > 0;
 

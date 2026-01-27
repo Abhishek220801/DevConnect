@@ -11,9 +11,7 @@ const Body = () => {
       <Navbar />
 
       <main className="flex-1 bg-black">
-        <image href="">
           <Outlet/>
-        </image>
       </main>
 
       <Footer />
