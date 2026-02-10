@@ -169,7 +169,7 @@ const Login = () => {
                   >
                     {showPassword ? (
                       <>
-                        <img src="public/show.png" alt="show-password-icon" />
+                        <img src="show.png" alt="show-password-icon" />
                       </>
                     ) : (
                       <>
