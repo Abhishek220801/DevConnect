@@ -10,6 +10,7 @@ import ProtectedRoute from "./components/ProtectedRoute"
 import About from "./components/About"
 import Privacy from "./components/Privacy"
 import Terms from "./components/Terms"
+import ForgotPasswordModal from "./components/ForgotModal"
 
 const Profile = lazy(() => import("./components/Profile"))
 const Feed = lazy(() => import("./components/Feed"))
@@ -58,6 +59,7 @@ function App() {
             <Route path="privacy" element={<Privacy/>} />
             <Route path="terms" element={<Terms/>} />
             <Route path="login" element={<Login />} />
+            {/* <Route path="forgot-password" element={<ForgotPasswordModal />} /> */}
             <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Routes>

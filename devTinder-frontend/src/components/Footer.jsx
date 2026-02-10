@@ -1,4 +1,4 @@
-import { Github, Linkedin, Twitter, Heart, Code } from "lucide-react";
+import { Github, Linkedin, Twitter, Heart } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -23,7 +23,7 @@ const Footer = () => {
             <div className="flex items-center gap-1.5 text-xs text-gray-400">
               <span>Made with</span>
               <Heart size={12} className="text-red-500 fill-red-500" />
-              <span>by developers</span>
+              <span>by Abhishek</span>
             </div>
           </div>
 
