@@ -55,6 +55,14 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="forgot-password"
+              element={
+                <ProtectedRoute>
+                  <ForgotPasswordModal/>
+                </ProtectedRoute>
+              }
+              />
             <Route path="about" element={<About/>} />
             <Route path="privacy" element={<Privacy/>} />
             <Route path="terms" element={<Terms/>} />

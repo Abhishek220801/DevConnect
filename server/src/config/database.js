@@ -1,15 +1,17 @@
-import mongoose from "mongoose";
+import mongoose from "mongoose"
 
-export async function connectDB(){
-    try {
-        await mongoose.connect(process.env.DB_URL);
-    } catch (err) {
-        console.error(`Error connecting to MongoDB: ${err}`);
-    }
+export default async function connectDB() {
+  try {
+    await mongoose.connect(process.env.DB_URL)
+    console.log("Connected successfully to mongoDB")
+  } catch (err) {
+    console.error(`Error connecting to MongoDB: ${err.message}`)
+    process.exit(1)
+  }
 }
 
-connectDB()
-    .then(console.log('Connected to MongoDB'))
-    .catch((err) => console.error('Error connecting to MongoDB : ', err))
-
-
+process.on("SIGINT", async () => {
+  await mongoose.disconnect()
+  console.log("Disconnect gracefully with mongoDB")
+  process.exit(0)
+})

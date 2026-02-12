@@ -35,7 +35,6 @@ requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
     }
 
     if (!toUser.emailId) {
-      console.error("Email missing for user:", toUserId)
       return res.status(400).json({ message: "Recipient email not available" })
     }
 
@@ -67,7 +66,6 @@ requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
     })
 
     const data = await connectionRequest.save()
-    console.log(toUser)
     await sendEmail({
       to: "abhi.sankhwar22@gmail.com",
       from: "no-reply@meetdev.online",
@@ -174,7 +172,6 @@ requestRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
       data,
     })
   } catch (err) {
-    console.error("Send request error:", err)
     return res.status(500).json({ message: "Server error", error: err.message })
   }
 })

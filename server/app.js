@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import express from "express";
-import { connectDB } from "./src/config/database.js";
+import connectDB from "./src/config/database.js";
 import cookieParser from "cookie-parser";
 import cors from 'cors';
 import fs from 'fs';
